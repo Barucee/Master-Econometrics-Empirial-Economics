@@ -1,26 +1,29 @@
 # Import Libraries
 library("readxl")
-<<<<<<< HEAD
 library("dplyr")
 require(dplyr)
 require(rlang)
-=======
-library(dplyr)
 library(purrr)
->>>>>>> bbef5363fa656a2c6231539871f171f5458e345f
 
 
-<<<<<<< HEAD
+
 # Creation of the Data Set
 outputLaevenAndValenciaRaw <- read_excel("./Laeven and Valencia, 2013 and 2018.xlsx", sheet = 2)
 WorldBankDataRaw <- read_excel("./WB data.xlsx")
+WorldBankexternernaldebtRaw <- read_excel("./WB data external debt.xlsx")
 
 # Change some column name
 WorldBankDataRaw <- WorldBankDataRaw %>% 
                                       rename(Country = `Country Name`)
+WorldBankexternernaldebtRaw <- WorldBankexternernaldebtRaw %>% 
+                                      rename(Country = `Country Name`)
 
+# change some country name in order that they are the same
 
-#Filter Data set
+WorldBankDataRaw$Country[WorldBankDataRaw$Country == "Hong Kong SAR, China"] <- "China, P.R.: Hong Kong"
+WorldBankDataRaw$Country[WorldBankDataRaw$Country == "Czechia"] <- "Czech Republic"
+
+#Creation of the subset advanced countries
 AdvancedCountry <- c("Australia"
                      , "Austria"
                      , "Belgium"
@@ -58,10 +61,18 @@ AdvancedCountry <- c("Australia"
                      , "United Kingdom"
                      , "United States")
 
-#attention Hong Kong avec une rédaction special
+
+# Filtering the countries
 outputLaevenAndValenciaAdvanced <- filter(outputLaevenAndValenciaRaw, Country %in% AdvancedCountry)
 WorldBankDataAdvanced <- filter(WorldBankDataRaw, Country %in% AdvancedCountry)
 
-=======
-WorldBankData <- read_excel("./WB data.xlsx", na="..")
->>>>>>> bbef5363fa656a2c6231539871f171f5458e345f
+#PB for this one !!!
+#!
+#!
+WorldBankexternernaldebtAdvanced <- filter(WorldBankexternernaldebtRaw, Country %in% AdvancedCountry)
+#!
+#!
+
+
+
+
