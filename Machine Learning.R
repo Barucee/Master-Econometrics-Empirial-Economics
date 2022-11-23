@@ -1,3 +1,4 @@
 #Creation of the Data Set
+library("readxl")
 
-#a
+output <- read.table("./Laeven and Valencia, 2013 and 2018.xlsx")
