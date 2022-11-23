@@ -1,6 +1,8 @@
 #Creation of the Data Set
 library("readxl")
+library(dplyr)
+library(purrr)
 
 outputLaevenAndValencia <- read_excel("./Laeven and Valencia, 2013 and 2018.xlsx", sheet = 2)
 
-WorldBankData <- read_excel("./WB data.xlsx")
+WorldBankData <- read_excel("./WB data.xlsx", na="..")
