@@ -78,5 +78,41 @@ WorldBankexternernaldebtAdvanced <- filter(WorldBankexternernaldebtRaw, Country 
 #!
 
 
+#coding crises
+bankingcrises<-outputLaevenAndValenciaAdvanced[,c(1,2)]
+colnames(bankingcrises)[2]<-"banking_crysis"
+bankingcrises$temp<-1
+
+bankingcrises<-spread(bankingcrises,banking_crysis, temp)
+bankingcrises[is.na(bankingcrises)] = 0
+bankingcrises$`1977`<- bankingcrises$`1977, 2008`
+bankingcrises$`1988`<- bankingcrises$`1988, 2007`
+
+bankingcrises$`2007`<- bankingcrises$`2007` + 
+  bankingcrises$`1988, 2007`
+
+bankingcrises$`1991`<- bankingcrises$`1991` +
+  bankingcrises$`1991, 2008`
+
+bankingcrises$`1992`<- bankingcrises$`1992` +
+  bankingcrises$`1992, 2008`
+
+bankingcrises$`1995`<- bankingcrises$`1995` +
+  bankingcrises$`1995, 2008`
+
+bankingcrises$`2008`<- bankingcrises$`2008` + 
+  bankingcrises$`1977, 2008` +
+  bankingcrises$`1991, 2008` +
+  bankingcrises$`1992, 2008` +
+  bankingcrises$`1995, 2008`
+
+bankingcrises<-bankingcrises[,-c(2,4,6,8,10,16)]
+bankingcrises <- pivot_longer(bankingcrises, cols = "1977":"2008", names_to = "year",
+                                values_to = "crisis", values_drop_na = TRUE)
+bankingcrises <- bankingcrises[,c(1,11,12)]
+
+
+
+
 
 
