@@ -12,6 +12,7 @@ outputLaevenAndValenciaRaw <- read_excel("./Laeven and Valencia, 2013 and 2018.x
 WorldBankDataRaw <- read_excel("./WB data.xlsx")
 WorldBankexternernaldebtRaw <- read_excel("./WB data external debt.xlsx")
 OpennessIndexWB <- read.csv("./OpennessIndexWB.csv", sep =",")
+IMFPublicDebtToGDP <- read_excel("./IMF - Public Debt-to-GDP.xls")
 
 
 # Change some column name
