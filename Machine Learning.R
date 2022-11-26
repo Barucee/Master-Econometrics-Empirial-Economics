@@ -11,12 +11,15 @@ library(purrr)
 outputLaevenAndValenciaRaw <- read_excel("./Laeven and Valencia, 2013 and 2018.xlsx", sheet = 2)
 WorldBankDataRaw <- read_excel("./WB data.xlsx")
 WorldBankexternernaldebtRaw <- read_excel("./WB data external debt.xlsx")
+OpennessIndexWB <- read.csv("./OpennessIndexWB.csv", sep =",")
+
 
 # Change some column name
 WorldBankDataRaw <- WorldBankDataRaw %>% 
                                       rename(Country = `Country Name`)
 WorldBankexternernaldebtRaw <- WorldBankexternernaldebtRaw %>% 
                                       rename(Country = `Country Name`)
+
 
 # change some country name in order that they are the same
 
@@ -69,7 +72,7 @@ WorldBankDataAdvanced <- filter(WorldBankDataRaw, Country %in% AdvancedCountry)
 #PB for this one !!!
 #!
 #!
-WorldBankexternernaldebtAdvanced <- filter(WorldBankexternernaldebtRaw, Country %in% AdvancedCountry)
+WorldBankexternernaldebtAdvanced <- filter(WorldBankexternernaldebtRaw, Country == "Australia")
 #!
 #!
 
