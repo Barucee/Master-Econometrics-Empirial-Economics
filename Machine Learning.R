@@ -11,6 +11,10 @@ library(purrr)
 # Creation of the Data Set
 outputLaevenAndValenciaRaw <- read_excel("./Laeven and Valencia, 2013 and 2018.xlsx", sheet = 2)
 WorldBankDataRaw <- read_excel("./WB data.xlsx", na = "..")
+<<<<<<< HEAD
+=======
+WorldBankexternernaldebtRaw <- read_excel("./WB data external debt.xlsx")
+>>>>>>> be992c07156540892f7c2164e01c56efd34cacb3
 IMFPublicDebtToGDP <- read_excel("./IMF - Public Debt-to-GDP.xls", na="no data")
 
 #PB OpennesIndexWB
