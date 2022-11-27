@@ -12,9 +12,12 @@ library(purrr)
 outputLaevenAndValenciaRaw <- read_excel("./Laeven and Valencia, 2013 and 2018.xlsx", sheet = 2)
 WorldBankDataRaw <- read_excel("./WB data.xlsx", na = "..")
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 WorldBankexternernaldebtRaw <- read_excel("./WB data external debt.xlsx")
 >>>>>>> be992c07156540892f7c2164e01c56efd34cacb3
+=======
+>>>>>>> 76b454398afa27470108fce68061ad7c5fc354db
 IMFPublicDebtToGDP <- read_excel("./IMF - Public Debt-to-GDP.xls", na="no data")
 
 #PB OpennesIndexWB
@@ -84,7 +87,10 @@ outputLaevenAndValenciaAdvanced <- filter(outputLaevenAndValenciaRaw, Country %i
 WorldBankDataAdvanced <- filter(WorldBankDataRaw, Country %in% AdvancedCountry)
 IMFPublicDebtToGDPAdvanced <- filter(IMFPublicDebtToGDP, Country %in% AdvancedCountry) #Pas Hong Kong
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 76b454398afa27470108fce68061ad7c5fc354db
 
 # Transform all from wide to long
 IMFPublicDebtToGDPAdvanced <- gather(IMFPublicDebtToGDPAdvanced, year, "Public Debt To GDP", "1950":"2020", factor_key=FALSE)
@@ -100,6 +106,19 @@ WorldBankDataAdvanced$Country <- as.array(WorldBankDataAdvanced$Country)
 df<- merge(IMFPublicDebtToGDPAdvanced,WorldBankDataAdvanced)
 df$openness_index <- df$Exports + df$Imports
 df <- select(df, -c(`External debt`,`Exports`,`Imports`,`Public debt`,`Bank capital to assets ratio (%)`) )
+
+
+#Merging 
+IMFPublicDebtToGDPAdvanced <- IMFPublicDebtToGDPAdvanced %>% 
+  rename ( Year = year) 
+IMFPublicDebtToGDPAdvanced$Year<- as.numeric(IMFPublicDebtToGDPAdvanced$Year)
+IMFPublicDebtToGDPAdvanced$Country<- as.array(IMFPublicDebtToGDPAdvanced$Country)
+
+WorldBankDataAdvanced$Country <- as.array(WorldBankDataAdvanced$Country)
+df<- merge(IMFPublicDebtToGDPAdvanced,WorldBankDataAdvanced)
+df$openness_index <- df$Exports + df$Imports
+df <- select(df, -c(`External debt`,`Exports`,`Imports`,`Public debt`,`Bank capital to assets ratio (%)`) )
+
 
 
 #coding crises
