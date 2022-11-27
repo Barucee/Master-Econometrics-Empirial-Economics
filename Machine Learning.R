@@ -29,6 +29,8 @@ WorldBankexternernaldebtRaw <- WorldBankexternernaldebtRaw %>%
 
 IMFPublicDebtToGDP <- IMFPublicDebtToGDP %>% 
                                       rename(Country = `General Government Debt (Percent of GDP)`)
+IMFPublicDebtToGDP <- IMFPublicDebtToGDP %>% 
+                                      rename(Year = `year`)
 
 
 
@@ -37,6 +39,7 @@ IMFPublicDebtToGDP <- IMFPublicDebtToGDP %>%
 
 WorldBankDataRaw$Country[WorldBankDataRaw$Country == "Hong Kong SAR, China"] <- "China, P.R.: Hong Kong"
 WorldBankDataRaw$Country[WorldBankDataRaw$Country == "Czechia"] <- "Czech Republic"
+IMFPublicDebtToGDP$Country[IMFPublicDebtToGDP$Country == "Korea, Republic of"] <- "Korea"
 
 #Creation of the subset advanced countries
 AdvancedCountry <- c("Australia"
@@ -92,18 +95,22 @@ WorldBankexternernaldebtAdvanced <- filter(WorldBankexternernaldebtRaw, Country 
 
 
 # Transform all from wide to long
-IMFPublicDebtToGDPAdvanced <- gather(IMFPublicDebtToGDPAdvanced, year, "Public Debt To GDP", "1950":"2020", factor_key=TRUE)
+IMFPublicDebtToGDPAdvanced <- gather(IMFPublicDebtToGDPAdvanced, Year, "Public Debt To GDP", "1950":"2020", factor_key=TRUE)
 
 
 #coding crises
 outputLaevenAndValenciaAdvanced <- outputLaevenAndValenciaAdvanced[,c(1,2)]
 outputLaevenAndValenciaAdvanced <- outputLaevenAndValenciaAdvanced %>% 
   separate_rows("Systemic Banking Crisis (starting date)", sep=",") %>% 
-  separate("Systemic Banking Crisis (starting date)", into=c("Crisis"),sep = "_", convert = TRUE)
+  separate("Systemic Banking Crisis (starting date)", into=c("Year"),sep = "_", convert = TRUE)
+outputLaevenAndValenciaAdvanced <- outputLaevenAndValenciaAdvanced %>% drop_na(Year)
+outputLaevenAndValenciaAdvanced$Crisis <- 1
 
 
-
-
+df <- merge(x=WorldBankDataAdvanced,y=IMFPublicDebtToGDPAdvanced, 
+            by=c("Country","Year"), all.x=TRUE)
+df <- merge(x=df,y=outputLaevenAndValenciaAdvanced, 
+             by=c("Country","Year"), all.x=TRUE)
 
 
 
