@@ -10,9 +10,8 @@ library(purrr)
 
 # Creation of the Data Set
 outputLaevenAndValenciaRaw <- read_excel("./Laeven and Valencia, 2013 and 2018.xlsx", sheet = 2)
-WorldBankDataRaw <- read_excel("./WB data.xlsx")
-WorldBankexternernaldebtRaw <- read_excel("./WB data external debt.xlsx")
-IMFPublicDebtToGDP <- read_excel("./IMF - Public Debt-to-GDP.xls")
+WorldBankDataRaw <- read_excel("./WB data.xlsx", na = "..")
+IMFPublicDebtToGDP <- read_excel("./IMF - Public Debt-to-GDP.xls", na="no data")
 
 #PB OpennesIndexWB
 ## !
@@ -20,11 +19,9 @@ OpennessIndexWB <- read.csv("./OpennessIndexWB.csv", sep =",")
 ## !
 #PB OpennesIndexWB
 
+
 # Change some column name
 WorldBankDataRaw <- WorldBankDataRaw %>% 
-                                      rename(Country = `Country Name`)
-
-WorldBankexternernaldebtRaw <- WorldBankexternernaldebtRaw %>% 
                                       rename(Country = `Country Name`)
 
 IMFPublicDebtToGDP <- IMFPublicDebtToGDP %>% 
@@ -82,13 +79,6 @@ AdvancedCountry <- c("Australia"
 outputLaevenAndValenciaAdvanced <- filter(outputLaevenAndValenciaRaw, Country %in% AdvancedCountry)
 WorldBankDataAdvanced <- filter(WorldBankDataRaw, Country %in% AdvancedCountry)
 IMFPublicDebtToGDPAdvanced <- filter(IMFPublicDebtToGDP, Country %in% AdvancedCountry) #Pas Hong Kong
-
-#PB for this one !!!
-#!
-#!
-WorldBankexternernaldebtAdvanced <- filter(WorldBankexternernaldebtRaw, Country == "Australia")
-#!
-#!
 
 
 # Transform all from wide to long
