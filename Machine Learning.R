@@ -96,11 +96,12 @@ IMFPublicDebtToGDPAdvanced <- gather(IMFPublicDebtToGDPAdvanced, year, "Public D
 
 
 #coding crises
-bankingcrises<-outputLaevenAndValenciaAdvanced[,c(1,2)]
 outputLaevenAndValenciaAdvanced <- outputLaevenAndValenciaAdvanced[,c(1,2)]
 outputLaevenAndValenciaAdvanced <- outputLaevenAndValenciaAdvanced %>% 
   separate_rows("Systemic Banking Crisis (starting date)", sep=",") %>% 
   separate("Systemic Banking Crisis (starting date)", into=c("Crisis"),sep = "_", convert = TRUE)
+
+
 
 
 
