@@ -81,8 +81,21 @@ WorldBankDataAdvanced <- filter(WorldBankDataRaw, Country %in% AdvancedCountry)
 IMFPublicDebtToGDPAdvanced <- filter(IMFPublicDebtToGDP, Country %in% AdvancedCountry) #Pas Hong Kong
 
 
+
 # Transform all from wide to long
-IMFPublicDebtToGDPAdvanced <- gather(IMFPublicDebtToGDPAdvanced, year, "Public Debt To GDP", "1950":"2020", factor_key=TRUE)
+IMFPublicDebtToGDPAdvanced <- gather(IMFPublicDebtToGDPAdvanced, year, "Public Debt To GDP", "1950":"2020", factor_key=FALSE)
+
+
+#Merging 
+IMFPublicDebtToGDPAdvanced <- IMFPublicDebtToGDPAdvanced %>% 
+  rename ( Year = year) 
+IMFPublicDebtToGDPAdvanced$Year<- as.numeric(IMFPublicDebtToGDPAdvanced$Year)
+IMFPublicDebtToGDPAdvanced$Country<- as.array(IMFPublicDebtToGDPAdvanced$Country)
+
+WorldBankDataAdvanced$Country <- as.array(WorldBankDataAdvanced$Country)
+df<- merge(IMFPublicDebtToGDPAdvanced,WorldBankDataAdvanced)
+df$openness_index <- df$Exports + df$Imports
+df <- select(df, -c(`External debt`,`Exports`,`Imports`,`Public debt`,`Bank capital to assets ratio (%)`) )
 
 
 #coding crises
