@@ -13,6 +13,9 @@ outputLaevenAndValenciaRaw <- read_excel("./Laeven and Valencia, 2013 and 2018.x
 WorldBankDataRaw <- read_excel("./WB data.xlsx")
 WorldBankexternernaldebtRaw <- read_excel("./WB data external debt.xlsx")
 IMFPublicDebtToGDP <- read_excel("./IMF - Public Debt-to-GDP.xls")
+WorldGDP <- read_excel("./WB data GDP.xls")
+
+
 
 #PB OpennesIndexWB
 ## !
@@ -31,6 +34,11 @@ IMFPublicDebtToGDP <- IMFPublicDebtToGDP %>%
                                       rename(Country = `General Government Debt (Percent of GDP)`)
 IMFPublicDebtToGDP <- IMFPublicDebtToGDP %>% 
                                       rename(Year = `year`)
+WorldGDP <- WorldGDP %>% 
+                      rename(Country = `Country Name`)
+
+
+
 
 
 
@@ -85,6 +93,7 @@ AdvancedCountry <- c("Australia"
 outputLaevenAndValenciaAdvanced <- filter(outputLaevenAndValenciaRaw, Country %in% AdvancedCountry)
 WorldBankDataAdvanced <- filter(WorldBankDataRaw, Country %in% AdvancedCountry)
 IMFPublicDebtToGDPAdvanced <- filter(IMFPublicDebtToGDP, Country %in% AdvancedCountry) #Pas Hong Kong
+WorldGDP <- filter(WorldGDP,Country == "World")
 
 #PB for this one !!!
 #!
@@ -93,9 +102,15 @@ WorldBankexternernaldebtAdvanced <- filter(WorldBankexternernaldebtRaw, Country 
 #!
 #!
 
+#delete some columns for world
+
+drop <- c("Country Code","Indicator Name","Indicator Code")
+WorldGDP = WorldGDP[,!(names(WorldGDP) %in% drop)]
+
 
 # Transform all from wide to long
 IMFPublicDebtToGDPAdvanced <- gather(IMFPublicDebtToGDPAdvanced, Year, "Public Debt To GDP", "1950":"2020", factor_key=TRUE)
+WorldGDP <- gather(WorldGDP, Year, "GDP growth", "1960":"2021", factor_key=TRUE)
 
 
 #coding crises
@@ -109,6 +124,8 @@ outputLaevenAndValenciaAdvanced$Crisis <- 1
 
 df <- merge(x=WorldBankDataAdvanced,y=IMFPublicDebtToGDPAdvanced, 
             by=c("Country","Year"), all.x=TRUE)
+df <- merge(x=df,y=WorldGDP, 
+            by=c("Year"), all.x=TRUE)
 df <- merge(x=df,y=outputLaevenAndValenciaAdvanced, 
              by=c("Country","Year"), all.x=TRUE)
 
