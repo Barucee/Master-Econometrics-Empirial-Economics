@@ -16,14 +16,16 @@ crises<-crises[,-4]
 
 
 
-# Change some column name
+# Change some variables'names
 WorldBankDataRaw <- WorldBankDataRaw %>% 
-  rename(Country = `Country Name`)
+  rename(Country = `Country Name`)%>% 
+  rename(public_debt = `Public Debt To GDP`)%>% 
+  rename(acc_balance = `Account Balance`)
+
 
 IMFPublicDebtToGDP <- IMFPublicDebtToGDP %>% 
-  rename(Country = `General Government Debt (Percent of GDP)`)
-
-
+  rename(Country = `General Government Debt (Percent of GDP)`)%>% 
+  rename ( Year = year) 
 
 
 # change some country name in order that they are the same
@@ -76,30 +78,38 @@ IMFPublicDebtToGDPAdvanced <- filter(IMFPublicDebtToGDP, Country %in% AdvancedCo
 rm(crises)
 rm(IMFPublicDebtToGDP)
 rm(WorldBankDataRaw)
-# Transform all from wide to long
+
+# Transforming IMF data from wide to long
 IMFPublicDebtToGDPAdvanced <- gather(
   IMFPublicDebtToGDPAdvanced, 
-  year, "Public Debt To GDP", 
+  Year, "Public Debt To GDP", 
   "1950":"2020", factor_key=FALSE)
 
 
 
 
-#Merging 
-IMFPublicDebtToGDPAdvanced <- IMFPublicDebtToGDPAdvanced %>% 
-  rename ( Year = year) 
 IMFPublicDebtToGDPAdvanced$Year<- as.numeric(IMFPublicDebtToGDPAdvanced$Year)
 IMFPublicDebtToGDPAdvanced$Country<- as.array(IMFPublicDebtToGDPAdvanced$Country)
-
 WorldBankDataAdvanced$Country <- as.array(WorldBankDataAdvanced$Country)
+
+#Merging IMF and WB data
 df<- merge(IMFPublicDebtToGDPAdvanced,WorldBankDataAdvanced)
+
+#Creating the "openness index"
 df$openness_index <- df$Exports + df$Imports
+
+#selecting variables of interest
 df <- select(df, -c(`External debt`,`Exports`,`Imports`,`Public debt`,`Bank capital to assets ratio (%)`) )
+
+#converting 'crises' data to yearly
 crisesAdvanced <- crisesAdvanced %>%
   group_by(Country, Year) %>%
   summarize(credit_gdp = mean(credit_gdp_ratio, na.rm=TRUE),
             banking_crysis = max(`Banking crisis`)) 
-df2<- merge(df,crisesAdvanced)
+
+#Merging with  crises data 
+df<- merge(df,crisesAdvanced)
+
 df_noNA<- df2 %>%
   na.omit(df2)
 
