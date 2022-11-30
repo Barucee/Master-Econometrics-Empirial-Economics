@@ -108,11 +108,23 @@ crisesAdvanced <- crisesAdvanced %>%
 
 #Merging with  crises data 
 df<- merge(df,crisesAdvanced)
+rm(WorldBankDataAdvanced)
+rm(IMFPublicDebtToGDPAdvanced)
+rm(crisesAdvanced)
+
+#Creating the variable corresponding to "pre crysis year"as in the paper
+#Pre-crisis: 1 if a crisis occurs in the next 3 years
+
 
 df_noNA<- df %>%
   na.omit(df)
 
-
+#a ne pas run sur df a cause du mutate_all
+df_noNA<- df_noNA %>% 
+  group_by(Country) %>%
+  mutate(Pre1 = lead(banking_crysis), Pre2 = lead(banking_crysis, 2))%>%
+  mutate_all(funs(ifelse(is.na(.), 0, .))) %>%
+  mutate(crysis = banking_crysis + Pre1 + Pre2 )
 
 
 
