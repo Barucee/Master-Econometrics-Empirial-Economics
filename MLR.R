@@ -112,24 +112,43 @@ rm(WorldBankDataAdvanced)
 rm(IMFPublicDebtToGDPAdvanced)
 rm(crisesAdvanced)
 
-#Creating the variable corresponding to "pre crysis year"as in the paper
-#Pre-crisis: 1 if a crisis occurs in the next 3 years
-
 
 df_noNA<- df %>%
   na.omit(df)
 
-#a ne pas run sur df a cause du mutate_all
+#Creating the variable corresponding to "pre crysis year"as in the paper
+#Pre-crisis: 1 if a crisis occurs in the next 3 years
+
 df_noNA<- df_noNA %>% 
   group_by(Country) %>%
   mutate(Pre1 = lead(banking_crysis), Pre2 = lead(banking_crysis, 2))%>%
   mutate_all(funs(ifelse(is.na(.), 0, .))) %>%
   mutate(crysis = banking_crysis + Pre1 + Pre2 )
 
+df_noNA$crysis<-as.factor(df_noNA$crysis)
+df_fitting<-df_noNA %>%
+  select(-banking_crysis, -Pre1, -Pre2)
+
+  
+# 
+install.packages("JOUSBoost")
+install.packages('adabag')                    # for fitting the adaboost model
+install.packages('caret')                    # for general data preparation and model fitting
+#install.packages("fastAdaboost")
+library(adabag)
+library(caret)
+library(JOUSBoost) #https://www.rdocumentation.org/packages/JOUSBoost/versions/2.1.0/topics/adaboost
+set.seed(777)
 
 
+#Comme dans le paper
+replication<- boosting(crysis ~., df_fitting, boos = T, mfinal = 10, coeflearn = 'Breiman',
+         control=rpart.control(maxdepth=1))
 
 
+train.control <- trainControl(method = "LOOCV")
+model <- train(crysis ~., data = df_noNA, method ="adaboost",
+               trControl = train.control)
 
 
 
