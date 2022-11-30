@@ -113,8 +113,7 @@ df<- merge(df,crisesAdvanced)
 #Pre-crisis: 1 if a crisis occurs in the next 3 years
 
 
-df_noNA<- df %>%
-  na.omit(df)
+df_noNA<-na.omit(df)
 
 #a ne pas run sur df
 df_noNA<- df_noNA %>% 
@@ -124,7 +123,19 @@ df_noNA<- df_noNA %>%
   mutate(crysis = banking_crysis + Pre1 + Pre2 )
 
 
+# 
+install.packages("JOUSBoost")
+install.packages('adabag')                    # for fitting the adaboost model
+install.packages('caret')                    # for general data preparation and model fitting
+library(adabag)
+library(caret)
+library(JOUSBoost) #https://www.rdocumentation.org/packages/JOUSBoost/versions/2.1.0/topics/adaboost
 
+train.control <- trainControl(method = "LOOCV")
+
+model <- train(banking_crysis ~., data = df_noNA, method ="adaboost",
+               trControl = train.control)
+1
 
 
 
