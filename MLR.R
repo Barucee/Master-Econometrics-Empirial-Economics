@@ -20,13 +20,11 @@ crises<-crises[,-4]
 # Change some variables'names
 WorldBankDataRaw <- WorldBankDataRaw %>% 
   rename(Country = `Country Name`)%>% 
-  rename(public_debt = `Public Debt To GDP`)%>% 
-  rename(acc_balance = `Account Balance`)
+  rename(acc_balance = `Account balance`)
 
 
 IMFPublicDebtToGDP <- IMFPublicDebtToGDP %>% 
-  rename(Country = `General Government Debt (Percent of GDP)`)%>% 
-  rename ( Year = year) 
+  rename(Country = `General Government Debt (Percent of GDP)`)
 
 
 # change some country name in order that they are the same
@@ -111,8 +109,8 @@ crisesAdvanced <- crisesAdvanced %>%
 #Merging with  crises data 
 df<- merge(df,crisesAdvanced)
 
-df_noNA<- df2 %>%
-  na.omit(df2)
+df_noNA<- df %>%
+  na.omit(df)
 
 
 
