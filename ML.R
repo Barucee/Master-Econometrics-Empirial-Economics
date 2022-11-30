@@ -6,9 +6,7 @@ library(tidyr)
 require(rlang)
 library(purrr)
 
-#Va voir MLR.R
-Va voir MLR.R
-"Va voir MLR.R
+
 
 # Creation of the Data Set
 outputLaevenAndValenciaRaw <- read_excel("./Laeven and Valencia, 2013 and 2018.xlsx", sheet = 2)
