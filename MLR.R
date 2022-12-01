@@ -140,6 +140,8 @@ library(caret)
 library(JOUSBoost) #https://www.rdocumentation.org/packages/JOUSBoost/versions/2.1.0/topics/adaboost
 set.seed(777)
 
+install.packages("C:/Users/33646/Downloads/fastAdaboost_1.0.0.tar.gz", repo=NULL, type="source")
+
 
 #Comme dans le paper
 replication<- boosting(crysis ~., df_fitting, boos = T, mfinal = 10, coeflearn = 'Breiman',
@@ -147,9 +149,9 @@ replication<- boosting(crysis ~., df_fitting, boos = T, mfinal = 10, coeflearn =
 
 
 train.control <- trainControl(method = "LOOCV")
-model <- train(crysis ~., data = df_noNA, method ="adaboost",
-               trControl = train.control)
-
+model <- train(crysis ~., data = df_fitting, method ="adaboost",
+               trControl = "none")
+1
 
 
 
