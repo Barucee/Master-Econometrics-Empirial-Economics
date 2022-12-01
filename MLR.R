@@ -149,8 +149,28 @@ replication<- adaboost( predictors, crises  , 1, 100, F)
 
 train.control <- trainControl(method = "LOOCV")
 
-model <- train(crysis ~., data = df_fitting, method ="adaboost",
+ModelADABoost <- train(crysis ~., data = df_fitting, method ="adaboost",
                trControl = "none")
 
 
+#xg boost
+
+install.packages("xgboost")
+require(xgboost)
+library(data.table)
+library(mlr)
+
+# https://www.hackerearth.com/practice/machine-learning/machine-learning-algorithms/beginners-tutorial-on-xgboost-parameter-tuning-r/tutorial/
+
+df_fittingtable <- setDT(df_fitting) 
+
+labels <- df_fitting$crysis 
+
+new_tr <- model.matrix(~+0,data = df_fittingtable[,-c("crysis"),with=F]) 
+
+dtrain <- xgb.DMatrix(data = new_tr,label = labels) 
+
+params <- list(booster = "gbtree", objective = "binary:logistic", eta=0.3, gamma=0, max_depth=6, min_child_weight=1, subsample=1, colsample_bytree=1)
+
+xgbcv <- xgb.cv( params = params, data = dtrain, nrounds = 100, nfold = 5, showsd = T, stratified = T, print.every.n = 10, early.stop.round = 20, maximize = F)
 
