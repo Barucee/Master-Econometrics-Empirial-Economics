@@ -134,13 +134,15 @@ df_fitting<-df_noNA %>%
 install.packages("JOUSBoost")
 install.packages('adabag')                    # for fitting the adaboost model
 install.packages('caret')                    # for general data preparation and model fitting
-#install.packages("fastAdaboost")
+install.packages("./fastAdaboost_1.0.0.tar.gz", repo=NULL, type="source")
+
 library(adabag)
 library(caret)
 library(JOUSBoost) #https://www.rdocumentation.org/packages/JOUSBoost/versions/2.1.0/topics/adaboost
+library(fastAdaboost)
 set.seed(777)
 
-install.packages("C:/Users/33646/Downloads/fastAdaboost_1.0.0.tar.gz", repo=NULL, type="source")
+
 
 
 #Comme dans le paper
