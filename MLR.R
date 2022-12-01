@@ -112,6 +112,23 @@ rm(WorldBankDataAdvanced)
 rm(IMFPublicDebtToGDPAdvanced)
 rm(crisesAdvanced)
 
+#Variable preparation
+library(datawizard)
+
+
+#detrending and standardizing the variables
+
+df<- detrend(df, select=c('Public Debt To GDP', 'Credit to private sector',
+                          'Inflation','openness_index','credit_gdp','Inflation','acc_balance'), group='Country')
+
+df<- df %>%
+  group_by(Country) %>%
+  standardize(, select=c('Public Debt To GDP', 'Credit to private sector',
+                         'Inflation','openness_index','credit_gdp'))
+
+
+            
+            
 
 df_noNA<- df %>%
   na.omit(df)
@@ -139,11 +156,15 @@ set.seed(777)
 
 
 
-#Comme dans le paper, faut voir le nombre de trees qu' ils utilisent
-predictors <- as.matrix(df_fitting[,5])
+#Estimating a first Adaboost Model with 200 trees and 1 node max
+
+predictors <- as.matrix(df_fitting[,c(3:8)])
 crises     <- as.matrix(df_fitting[,9])
 
-replication<- adaboost( predictors, crises  , 1, 100, F)
+train_index<- sample(1:603,483)
+replication<- adaboost(predictors[train_index,], crises[train_index], 1, 100, F)
+predictions_test<-predict(replication,predictors[-train_index,], 'response')
+
 
 
 
