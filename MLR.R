@@ -116,6 +116,7 @@ rm(crisesAdvanced)
 df_noNA<- df %>%
   na.omit(df)
 
+
 #Creating the variable corresponding to "pre crysis year"as in the paper
 #Pre-crisis: 1 if a crisis occurs in the next 3 years
 
@@ -125,35 +126,31 @@ df_noNA<- df_noNA %>%
   mutate_all(funs(ifelse(is.na(.), 0, .))) %>%
   mutate(crysis = banking_crysis + Pre1 + Pre2 )
 
-df_noNA$crysis<-as.factor(df_noNA$crysis)
+df_noNA$crysis[df_noNA$crysis == 0] <- -1 
+
 df_fitting<-df_noNA %>%
   select(-banking_crysis, -Pre1, -Pre2)
 
   
 # 
-install.packages("JOUSBoost")
-install.packages('adabag')                    # for fitting the adaboost model
-install.packages('caret')                    # for general data preparation and model fitting
-install.packages("./fastAdaboost_1.0.0.tar.gz", repo=NULL, type="source")
-
-library(adabag)
-library(caret)
 library(JOUSBoost) #https://www.rdocumentation.org/packages/JOUSBoost/versions/2.1.0/topics/adaboost
-library(fastAdaboost)
 set.seed(777)
 
 
 
 
-#Comme dans le paper
-replication<- boosting(crysis ~., df_fitting, boos = T, mfinal = 10, coeflearn = 'Breiman',
-         control=rpart.control(maxdepth=1))
+#Comme dans le paper, faut voir le nombre de trees qu' ils utilisent
+predictors <- as.matrix(df_fitting[,5])
+crises     <- as.matrix(df_fitting[,9])
+
+replication<- adaboost( predictors, crises  , 1, 100, F)
+
 
 
 train.control <- trainControl(method = "LOOCV")
+
 model <- train(crysis ~., data = df_fitting, method ="adaboost",
                trControl = "none")
-1
 
 
 
