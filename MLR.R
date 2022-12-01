@@ -156,22 +156,32 @@ set.seed(777)
 
 
 
-#Estimating a first Adaboost Model with 200 trees and 1 node max
 
+#Defining predictors and response variables
 predictors <- as.matrix(df_fitting[,c(3:8)])
 crises     <- as.matrix(df_fitting[,9])
 
-train_index<- sample(1:603,483)
-replication<- adaboost(predictors[train_index,], crises[train_index], 1, 100, F)
+
+#Estimating the average Sensitivity, Accuracy and Precision over 100 iterarions
+
+#A changer
+for (i in (1:2) ) {
+  train_index_`i`<- sample(1:603,400)
+  replication_`i`<- adaboost(predictors[train_index_`i`,], crises[train_index_`i`], 1, 30, F)
+  predictions_test<-predict(replication,predictors[-train_index_`i`,], 'response')
+  x<-table(predictions_test_`i`,crises[-train_index_`i`])
+  confusion_matrix <- 0 + x   
+}
+
+
+set.seed(777)
+
+train_index<- sample(1:603,400)
+replication<- adaboost(predictors[train_index,], crises[train_index], 1, 30, F)
 predictions_test<-predict(replication,predictors[-train_index,], 'response')
 
 
 
-
-train.control <- trainControl(method = "LOOCV")
-
-ModelADABoost <- train(crysis ~., data = df_fitting, method ="adaboost",
-               trControl = "none")
 
 
 #xg boost
