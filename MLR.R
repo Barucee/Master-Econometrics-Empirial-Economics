@@ -146,6 +146,7 @@ df_fitting<-df_noNA %>%
 # Adaboost
 library(JOUSBoost) 
 library(foreach)
+install.packages("doSNOW")
 library(doSNOW)
 set.seed(777)
 
@@ -172,33 +173,33 @@ trees.num = c( (seq(20 , 100 , by  = 10)),
 
 adaboost.grid <-
   foreach(t = tree.nodes) %:%
-  foreach(n = trees.num)  %dopar% {
-  adabst = JOUSBoost::adaboost(predictors[train.index,], crises[train.index,], tree_depth = t, n_rounds =n)
+    foreach(n = trees.num)  %dopar% {
+      adabst = JOUSBoost::adaboost(predictors[train.index,], crises[train.index,], tree_depth = t, n_rounds =n)
 
-  confusion.train   = adabst$confusion_matrix
-  accuracy.train    = (confusion.train[2,2] + confusion.train[1,1] ) / sum(confusion.train)
-  precision.train   = confusion.train[2,2]  / sum(confusion.train[,2])
-  sensitivity.train = confusion.train[2,2]  / sum(confusion.train[2,])
+      confusion.train   = adabst$confusion_matrix
+      accuracy.train    = (confusion.train[2,2] + confusion.train[1,1] ) / sum(confusion.train)
+      precision.train   = confusion.train[2,2]  / sum(confusion.train[,2])
+      sensitivity.train = confusion.train[2,2]  / sum(confusion.train[2,])
   
-  adabst.yhat = JOUSBoost::predict.adaboost(adabst,predictors[-train.index,], type="response")
-  confusion.test = table(ytrue, adabst.yhat)
-  accuracy.test    = (confusion.test[2,2] + confusion.test[1,1] ) / sum(confusion.test)
-  precision.test   = confusion.test[2,2]  / sum(confusion.test[,2])
-  sensitivity.test = confusion.test[2,2]  / sum(confusion.test[2,])
+      adabst.yhat = JOUSBoost::predict.adaboost(adabst,predictors[-train.index,], type="response")
+      confusion.test = table(ytrue, adabst.yhat)
+      accuracy.test    = (confusion.test[2,2] + confusion.test[1,1] ) / sum(confusion.test)
+      precision.test   = confusion.test[2,2]  / sum(confusion.test[,2])
+      sensitivity.test = confusion.test[2,2]  / sum(confusion.test[2,])
   
-  results = data.frame(
-    algorithm = "AdaBoost",
-    tree.nodes = t,
-    tree.num = n,
-    accuracy = accuracy.test,
-    precision = precision.test,
-    sensitivity = sensitivity.test,
-    training_accuracy = accuracy.train,
-    training_precision = precision.train,
-    training_sensitivity = sensitivity.train,
-    stringsAsFactors = FALSE)
+      results = data.frame(
+        algorithm = "AdaBoost",
+        tree.nodes = t,
+        tree.num = n,
+        accuracy = accuracy.test,
+        precision = precision.test,
+        sensitivity = sensitivity.test,
+        training_accuracy = accuracy.train,
+        training_precision = precision.train,
+        training_sensitivity = sensitivity.train,
+        stringsAsFactors = FALSE)
   
-  results<- list(model = adabst, metrics = results)
+      results<- list(model = adabst, metrics = results)
   }
 
 
