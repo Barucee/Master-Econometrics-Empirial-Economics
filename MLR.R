@@ -146,12 +146,11 @@ df_fitting<-df_noNA %>%
 # Adaboost
 library(JOUSBoost) 
 library(foreach)
-install.packages("doSNOW")
 library(doSNOW)
 set.seed(777)
 
 #put processor cores
-cores <- makeCluster(1)
+cores <- makeCluster(4)
 registerDoSNOW(cores)
 
 
@@ -165,42 +164,61 @@ ytrue<-crises[-train.index]
 
 #Let's look at how the number of trees and nodes impacts Sensitivity, precision and accuracy
 
+x_dev = as.matrix(dev_data)
+
+tree_depth = 1:3
+n_trees = c(
+  (seq(from = 10, to = 20, by = 10)),
+  (seq(from = 250, to = 400, by = 50)))
+# AdaBoost will run 555 times. This is going to take a long time!
+
+start_time <- Sys.time()
+
+# packages for parallel processing
 
 
-tree.nodes = 1:6
-trees.num = c( (seq(20 , 100 , by  = 10)), 
-             (seq(100, 250 , by  = 50))) 
+numOfclusters <- 4 # yup, i've got 10+ clusters on my machine :)
+cl <- makeCluster(numOfclusters)
+registerDoSNOW(cl)
 
-adaboost.grid <-
-  foreach(t = tree.nodes) %:%
-    foreach(n = trees.num)  %dopar% {
-      adabst = JOUSBoost::adaboost(predictors[train.index,], crises[train.index,], tree_depth = t, n_rounds =n)
-
-      confusion.train   = adabst$confusion_matrix
-      accuracy.train    = (confusion.train[2,2] + confusion.train[1,1] ) / sum(confusion.train)
-      precision.train   = confusion.train[2,2]  / sum(confusion.train[,2])
-      sensitivity.train = confusion.train[2,2]  / sum(confusion.train[2,])
-  
-      adabst.yhat = JOUSBoost::predict.adaboost(adabst,predictors[-train.index,], type="response")
-      confusion.test = table(ytrue, adabst.yhat)
-      accuracy.test    = (confusion.test[2,2] + confusion.test[1,1] ) / sum(confusion.test)
-      precision.test   = confusion.test[2,2]  / sum(confusion.test[,2])
-      sensitivity.test = confusion.test[2,2]  / sum(confusion.test[2,])
-  
-      results = data.frame(
-        algorithm = "AdaBoost",
-        tree.nodes = t,
-        tree.num = n,
-        accuracy = accuracy.test,
-        precision = precision.test,
-        sensitivity = sensitivity.test,
-        training_accuracy = accuracy.train,
-        training_precision = precision.train,
-        training_sensitivity = sensitivity.train,
-        stringsAsFactors = FALSE)
-  
-      results<- list(model = adabst, metrics = results)
+adaBoost_grid <-
+  foreach(t = tree_depth) %:%
+  foreach(n = n_trees) %dopar% {
+    mod = JOUSBoost::adaboost(X = predictors, y = crises, tree_depth = t, n_rounds =n)
+    # training results
+    tr_conf = mod$confusion_matrix
+    tr_precision = tr_conf[2,2]/sum(tr_conf[,2])
+    tr_recall = tr_conf[2,2]/sum(tr_conf[2,])
+    tr_accuracy = (tr_conf[1,1] + tr_conf[2,2]) / length(crises)
+    tr_f1_score = 2 * tr_precision * tr_recall / (tr_precision + tr_recall)
+    
+    # dev_test results
+    preds = JOUSBoost::predict.adaboost(mod, X=predictors, type="response")
+    conf = table(crises, preds)
+    precision = conf[2,2]/sum(conf[,2])
+    recall = conf[2,2]/sum(conf[2,])
+    accuracy = (conf[1,1] + conf[2,2]) / length(crises)
+    f1_score = 2 * precision * recall / (precision + recall)
+    
+    # metrics to append
+    model_results = data.frame(algo = "AdaBoost",
+                               tree_depth = t,
+                               n_trees = n,
+                               accuracy = accuracy,
+                               precision = precision,
+                               recall = recall,
+                               f1_score = f1_score,
+                               training_accuracy = tr_accuracy,
+                               training_precision = tr_precision,
+                               training_recall = tr_recall,
+                               training_f1_score = tr_f1_score,
+                               stringsAsFactors = FALSE)
+    
+    # final list item to return
+    list(model = mod, metrics = model_results)
   }
+
+
 
 
 
