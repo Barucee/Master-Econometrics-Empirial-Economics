@@ -156,52 +156,40 @@ set.seed(777)
 
 
 
-
 #Defining predictors and response variables
 predictors <- as.matrix(df_fitting[,c(3:8)])
 crises     <- as.matrix(df_fitting[,9])
 
 
-#Estimating the average Sensitivity, Accuracy and Precision over 100 iterarions
 
-#A changer
-for (i in (1:2) ) {
-  train_index_`i`<- sample(1:603,400)
-  replication_`i`<- adaboost(predictors[train_index_`i`,], crises[train_index_`i`], 1, 30, F)
-  predictions_test<-predict(replication,predictors[-train_index_`i`,], 'response')
-  x<-table(predictions_test_`i`,crises[-train_index_`i`])
-  confusion_matrix <- 0 + x   
+#Let's look at how the number of trees and nodes impacts Sensitivity, precision and accuracy
+train_index<- sample(1:603,400)
+crises_test<-crises[-train_index]
+
+#with 1 node
+for (i in c(20,50,100,200,500,1000)) {
+  x.ada <- adaboost(predictors[train_index,], crises[train_index], 1, i , F)
+  prediction <- predict(x.ada ,predictors[-train_index,], 'response')
+  assign(paste0("confusionmatrix",i), table(prediction,crises_test) )
 }
 
+#with 2 nodes
+for (i in c(20,50,100,200,500,1000)) {
+  x.ada <- adaboost(predictors[train_index,], crises[train_index], 2, i , F)
+  prediction <- predict(x.ada ,predictors[-train_index,], 'response')
+  assign(paste0("confusionmatrix.2.",i), table(prediction,crises_test) )
+}
 
-set.seed(777)
+#with 4 nodes
+for (i in c(20,50,100,200,500,1000)) {
+  x.ada <- adaboost(predictors[train_index,], crises[train_index], 3, i , F)
+  prediction <- predict(x.ada ,predictors[-train_index,], 'response')
+  assign(paste0("confusionmatrix.4.",i), table(prediction,crises_test) )
+}
 
-train_index<- sample(1:603,400)
-replication<- adaboost(predictors[train_index,], crises[train_index], 1, 30, F)
-predictions_test<-predict(replication,predictors[-train_index,], 'response')
-
-
-
-
-
-#xg boost
-
-install.packages("xgboost")
-require(xgboost)
-library(data.table)
-library(mlr)
-
-# https://www.hackerearth.com/practice/machine-learning/machine-learning-algorithms/beginners-tutorial-on-xgboost-parameter-tuning-r/tutorial/
-
-df_fittingtable <- setDT(df_fitting) 
-
-labels <- df_fitting$crysis 
-
-new_tr <- model.matrix(~+0,data = df_fittingtable[,-c("crysis"),with=F]) 
-
-dtrain <- xgb.DMatrix(data = new_tr,label = labels) 
-
-params <- list(booster = "gbtree", objective = "binary:logistic", eta=0.3, gamma=0, max_depth=6, min_child_weight=1, subsample=1, colsample_bytree=1)
-
-xgbcv <- xgb.cv( params = params, data = dtrain, nrounds = 100, nfold = 5, showsd = T, stratified = T, print.every.n = 10, early.stop.round = 20, maximize = F)
-
+#with 6 nodes
+for (i in c(20,50,100,200,500,1000)) {
+  x.ada <- adaboost(predictors[train_index,], crises[train_index], 3, i , F)
+  prediction <- predict(x.ada ,predictors[-train_index,], 'response')
+  assign(paste0("confusionmatrix.6.",i), table(prediction,crises_test) )
+}
