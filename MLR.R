@@ -118,9 +118,10 @@ library(datawizard)
 
 #detrending and standardizing the variables
 
-df<- detrend(df, select=c('Public Debt To GDP', 'Credit to private sector',
-                          'Inflation','openness_index','credit_gdp','Inflation','acc_balance'), group='Country')            
-            
+df<- df %>%
+  group_by(Country) %>%
+  standardize(, select=c('Public Debt To GDP', 'Credit to private sector',
+                         'Inflation','openness_index','credit_gdp'))          
 
 df_noNA<- df %>%
   na.omit(df)
@@ -132,7 +133,8 @@ df_noNA<- df %>%
 df_noNA<- df_noNA %>% 
   group_by(Country) %>%
   mutate(Pre1 = lead(banking_crysis), Pre2 = lead(banking_crysis, 2))%>%
-  mutate_all(funs(ifelse(is.na(.), 0, .))) %>%
+
+    mutate_all(funs(ifelse(is.na(.), 0, .))) %>%
   mutate(crysis = banking_crysis + Pre1 + Pre2 )
 
 df_noNA$crysis[df_noNA$crysis == 0] <- -1 
@@ -141,47 +143,63 @@ df_fitting<-df_noNA %>%
   select(-banking_crysis, -Pre1, -Pre2)
 
   
-# 
-library(JOUSBoost) #https://www.rdocumentation.org/packages/JOUSBoost/versions/2.1.0/topics/adaboost
+# Adaboost
+library(JOUSBoost) 
+library(foreach)
+library(doSNOW)
 set.seed(777)
 
-
+#put processor cores
+cores <- makeCluster(1)
+registerDoSNOW(cores)
 
 
 #Defining predictors and response variables
 predictors <- as.matrix(df_fitting[,c(3:8)])
 crises     <- as.matrix(df_fitting[,9])
 
-
+#Creating a test and training sample
+train.index<- sample(1:603,400)
+ytrue<-crises[-train.index]
 
 #Let's look at how the number of trees and nodes impacts Sensitivity, precision and accuracy
-train_index<- sample(1:603,400)
-crises_test<-crises[-train_index]
 
-#with 1 node
-for (i in c(20,50,100,200,500,1000)) {
-  x.ada <- adaboost(predictors[train_index,], crises[train_index], 1, i , F)
-  prediction <- predict(x.ada ,predictors[-train_index,], 'response')
-  assign(paste0("confusionmatrix",i), table(prediction,crises_test) )
-}
 
-#with 2 nodes
-for (i in c(20,50,100,200,500,1000)) {
-  x.ada <- adaboost(predictors[train_index,], crises[train_index], 2, i , F)
-  prediction <- predict(x.ada ,predictors[-train_index,], 'response')
-  assign(paste0("confusionmatrix.2.",i), table(prediction,crises_test) )
-}
 
-#with 4 nodes
-for (i in c(20,50,100,200,500,1000)) {
-  x.ada <- adaboost(predictors[train_index,], crises[train_index], 3, i , F)
-  prediction <- predict(x.ada ,predictors[-train_index,], 'response')
-  assign(paste0("confusionmatrix.4.",i), table(prediction,crises_test) )
-}
+tree.nodes = 1:6
+trees.num = c( (seq(20 , 100 , by  = 10)), 
+             (seq(100, 250 , by  = 50))) 
 
-#with 6 nodes
-for (i in c(20,50,100,200,500,1000)) {
-  x.ada <- adaboost(predictors[train_index,], crises[train_index], 3, i , F)
-  prediction <- predict(x.ada ,predictors[-train_index,], 'response')
-  assign(paste0("confusionmatrix.6.",i), table(prediction,crises_test) )
-}
+adaboost.grid <-
+  foreach(t = tree.nodes) %:%
+  foreach(n = trees.num)  %dopar% {
+  adabst = JOUSBoost::adaboost(predictors[train.index,], crises[train.index,], tree_depth = t, n_rounds =n)
+
+  confusion.train   = adabst$confusion_matrix
+  accuracy.train    = (confusion.train[2,2] + confusion.train[1,1] ) / sum(confusion.train)
+  precision.train   = confusion.train[2,2]  / sum(confusion.train[,2])
+  sensitivity.train = confusion.train[2,2]  / sum(confusion.train[2,])
+  
+  adabst.yhat = JOUSBoost::predict.adaboost(adabst,predictors[-train.index,], type="response")
+  confusion.test = table(ytrue, adabst.yhat)
+  accuracy.test    = (confusion.test[2,2] + confusion.test[1,1] ) / sum(confusion.test)
+  precision.test   = confusion.test[2,2]  / sum(confusion.test[,2])
+  sensitivity.test = confusion.test[2,2]  / sum(confusion.test[2,])
+  
+  results = data.frame(
+    algorithm = "AdaBoost",
+    tree.nodes = t,
+    tree.num = n,
+    accuracy = accuracy.test,
+    precision = precision.test,
+    sensitivity = sensitivity.test,
+    training_accuracy = accuracy.train,
+    training_precision = precision.train,
+    training_sensitivity = sensitivity.train,
+    stringsAsFactors = FALSE)
+  
+  results<- list(model = adabst, metrics = results)
+  }
+
+
+
