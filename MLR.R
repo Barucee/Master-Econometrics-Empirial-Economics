@@ -119,15 +119,7 @@ library(datawizard)
 #detrending and standardizing the variables
 
 df<- detrend(df, select=c('Public Debt To GDP', 'Credit to private sector',
-                          'Inflation','openness_index','credit_gdp','Inflation','acc_balance'), group='Country')
-
-df<- df %>%
-  group_by(Country) %>%
-  standardize(, select=c('Public Debt To GDP', 'Credit to private sector',
-                         'Inflation','openness_index','credit_gdp'))
-
-
-            
+                          'Inflation','openness_index','credit_gdp','Inflation','acc_balance'), group='Country')            
             
 
 df_noNA<- df %>%
