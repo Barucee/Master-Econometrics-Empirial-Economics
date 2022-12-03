@@ -272,3 +272,21 @@ save_kable(adagridtab_1,'adagrid1.tex')
 save_kable(adagridtab_2,'adagrid2.tex')
 
 
+# Graph 3D of the score by the hyperparameters :
+library(graph3d)
+
+graph3d(
+  adaboost_metrics,
+  ~tree.nodes, ~tree.num, ~score,
+  type = "bar"
+)
+
+
+
+###################################### XG-Boost ######################################
+
+dtrain <- xgb.DMatrix(data = xtrain,
+                      label=ytrain)
+dvalidation <- xgb.DMatrix(data= xtest,
+                           label = ytest)
+

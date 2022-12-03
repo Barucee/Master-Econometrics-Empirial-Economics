@@ -217,8 +217,3 @@ adaBoost_grid <-
     # final list item to return
     list(model = mod, metrics = model_results)
   }
-
-
-
-
-
