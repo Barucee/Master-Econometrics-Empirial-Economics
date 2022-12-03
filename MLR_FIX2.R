@@ -346,7 +346,7 @@ xgb_metrics <- data.frame(algo = character(),
 
 
 ConfusionMatrix <- function(prediction, truth) {
-  conf <- table(truth, prediction)
+  conf <- matrix(c(table(prediction, truth),0,0),nrow=2)
   df <- data.frame(precision = conf[2,2]/sum(conf[,2]),
                    recall = conf[2,2]/sum(conf[2,]),
                    accuracy = (conf[1,1] + conf[2,2]) / length(prediction))
@@ -354,11 +354,11 @@ ConfusionMatrix <- function(prediction, truth) {
   return(list(confusion_matrix=conf, metrics=df))
 }
 
+
 for(i in 1:28) {
   mod = xgb_models[[i]]
   preds = predict(mod, dvalidation, type="response")
   validation_metrics = ConfusionMatrix(preds > 0.5, ytest)$metrics
-  
   
   training_preds = predict(mod, dtrain, type="response")
   training_metrics = ConfusionMatrix(training_preds > 0.5, ytrain)$metrics
@@ -378,6 +378,8 @@ for(i in 1:28) {
             training_f1_score = training_metrics$f1)
   
 }
+
+
 
 
 
