@@ -280,13 +280,105 @@ graph3d(
   ~tree.nodes, ~tree.num, ~score,
   type = "bar"
 )
-
-
-
 ###################################### XG-Boost ######################################
+
+library(xgboost)
+
+ytrain = ifelse(ytrain == 1, 1, 0) 
+ytest = ifelse(ytest == 1, 1, 0) 
+
 
 dtrain <- xgb.DMatrix(data = xtrain,
                       label=ytrain)
 dvalidation <- xgb.DMatrix(data= xtest,
                            label = ytest)
+
+watchlist <- list(train=dtrain, validation=dvalidation)
+
+
+max_depth <- 2:8 
+shrinkage <- c(0.1, 0.01, 0.001, 0.0001) 
+xgb_models <- list()
+
+for(d in max_depth) {
+  for(s in shrinkage){
+    param <- list(
+      objective = "binary:logistic",
+      eta = s,
+      max_depth = d,
+      colsamplebytree = 0.8,
+      subsample = 0.8, 
+      #min_child_weight = 3,
+      base_score = 0.50,
+      #lambda = 100,
+      #lambda_bias = 5,
+      #alpha = 0.1,
+      verbose = FALSE
+    )
+    
+    mod = xgboost::xgb.train(
+      params = param,
+      data = dtrain, 
+      nrounds = 1000,
+      watchlist = watchlist, 
+      nthread = 10,
+      maximize = FALSE,
+      early_stopping_rounds = 100,
+      verbose = FALSE)
+    
+    xgb_models = append(xgb_models, list(mod))
+  }
+}
+
+xgb_metrics <- data.frame(algo = character(),
+                          tree_depth = integer(),
+                          n_trees = integer(),
+                          shrinkage = numeric(),
+                          accuracy = numeric(),
+                          precision = numeric(),
+                          recall = numeric(),
+                          f1_score = numeric(),
+                          training_accuracy = numeric(),
+                          training_precision = numeric(),
+                          training_recall = numeric(),
+                          training_f1_score = numeric(),
+                          stringsAsFactors = FALSE)
+
+
+ConfusionMatrix <- function(prediction, truth) {
+  conf <- table(truth, prediction)
+  df <- data.frame(precision = conf[2,2]/sum(conf[,2]),
+                   recall = conf[2,2]/sum(conf[2,]),
+                   accuracy = (conf[1,1] + conf[2,2]) / length(prediction))
+  df$f1 <- 2/((1/df$precision) + (1/df$recall))
+  return(list(confusion_matrix=conf, metrics=df))
+}
+
+for(i in 1:28) {
+  mod = xgb_models[[i]]
+  preds = predict(mod, dvalidation, type="response")
+  validation_metrics = ConfusionMatrix(preds > 0.5, ytest)$metrics
+  
+  
+  training_preds = predict(mod, dtrain, type="response")
+  training_metrics = ConfusionMatrix(training_preds > 0.5, ytrain)$metrics
+  
+  xgb_metrics <- xgb_metrics %>% 
+    add_row(algo = "Gradient Boosting",
+            tree_depth = d[i],
+            n_trees = mod$niter,
+            shrinkage = s[i],
+            accuracy = validation_metrics$accuracy,
+            precision = validation_metrics$precision,
+            recall = validation_metrics$recall,
+            f1_score = validation_metrics$f1,
+            training_accuracy = training_metrics$accuracy,
+            training_precision = training_metrics$precision,
+            training_recall = training_metrics$recall,
+            training_f1_score = training_metrics$f1)
+  
+}
+
+
+
 
