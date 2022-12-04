@@ -280,6 +280,9 @@ graph3d(
   ~tree.nodes, ~tree.num, ~score,
   type = "bar"
 )
+
+
+
 ###################################### XG-Boost ######################################
 
 library(xgboost)
@@ -344,11 +347,11 @@ xgb_metrics <- data.frame(algo = character(),
                           shrinkage = numeric(),
                           accuracy = numeric(),
                           precision = numeric(),
-                          recall = numeric(),
+                          sensitivity = numeric(),
                           score = numeric(),
                           training_accuracy = numeric(),
                           training_precision = numeric(),
-                          training_recall = numeric(),
+                          training_sensitivity = numeric(),
                           training_score = numeric(),
                           stringsAsFactors = FALSE)
 
@@ -356,9 +359,9 @@ xgb_metrics <- data.frame(algo = character(),
 ConfusionMatrix <- function(prediction, truth) {
   conf <- matrix(c(table(prediction, truth),0,0),nrow=2)
   df <- data.frame(precision = conf[2,2]/sum(conf[,2]),
-                   recall = conf[2,2]/sum(conf[2,]),
+                   sensitivity = conf[2,2]/sum(conf[2,]),
                    accuracy = (conf[1,1] + conf[2,2]) / length(prediction))
-  df$score <- ( 0.5*df$recall + 
+  df$score <- ( 0.5*df$sensitivity + 
                                 0.3*df$precision +
                                 0.2*df$accuracy)
   return(list(confusion_matrix=conf, metrics=df))
@@ -379,12 +382,29 @@ for(i in 1:28) {
             shrinkage = slist[[i]],
             accuracy = validation_metrics$accuracy,
             precision = validation_metrics$precision,
-            recall = validation_metrics$recall,
+            sensitivity = validation_metrics$sensitivity,
             score = validation_metrics$score,
             training_accuracy = training_metrics$accuracy,
             training_precision = training_metrics$precision,
-            training_recall = training_metrics$recall,
+            training_sensitivity = training_metrics$sensitivity,
             training_score = training_metrics$score)
 }
 
+xgb_metrics$accuracy  <-round(xgb_metrics$accuracy, 3)
+xgb_metrics$precision <-round(xgb_metrics$precision, 3)
+xgb_metrics$sensitivity <-round(xgb_metrics$sensitivity, 3)
+xgb_metrics$score <-round(xgb_metrics$score, 3)
 
+xgbgridtab1<-xgb_metrics[1:28,] %>% 
+  select(tree_depth, n_trees, shrinkage, accuracy, precision, sensitivity, score) %>% 
+  arrange(tree_depth, n_trees)
+
+xgbgridtab_1 <- kbl(xgbgridtab1, 'latex', caption = "XGB Gridsearch", booktabs=T, 
+                    linesep=c("","", "", "","", "", "", "\\hline")) %>% #LINESEP A CHANGER SI ON CHANGE LE GRID
+  kable_styling(latex_options = c("striped", "scale_down")) %>%
+  column_spec(3, color = spec_color(adagridtab1$accuracy, end = 0.8, direction = -1))%>%
+  column_spec(4, color = spec_color(adagridtab1$precision, end = 0.8, direction = -1))%>%
+  column_spec(5, color = spec_color(adagridtab1$sensitivity, end = 0.8, direction = -1))%>%
+  column_spec(6, color = spec_color(adagridtab1$score, end = 0.8, direction = -1))
+
+save_kable(xgbgridtab_1,'xgbgridtab_1.tex')

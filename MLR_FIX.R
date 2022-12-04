@@ -199,7 +199,7 @@ trees.num = c(
 
 #this is for parallel processing, put processor cores in clusters
 
-numOfclusters <- 4 
+numOfclusters <- 3
 cl <- makeCluster(numOfclusters)
 registerDoSNOW(cl)
 
@@ -293,23 +293,23 @@ library(ggplot2)
 library(gridExtra)
 ada_accuracy<- ggplot(adaboost_metrics, aes(x=tree.nodes, y = accuracy)) + 
   geom_point(aes(colour = as.factor(tree.num)),size = 3) + 
-  scale_color_discrete("# of nodes") + 
-  ggtitle("Accuracy and number of nodes")
+  scale_color_discrete("# of tree") + 
+  ggtitle("Accuracy in function of # of tree and node")
 
 ada_precision<- ggplot(adaboost_metrics, aes(x=tree.nodes, y = precision)) + 
   geom_point(aes(colour = as.factor(tree.num)),size = 3) + 
-  scale_color_discrete("# of nodes") + 
-  ggtitle("Precision and number of nodes")
+  scale_color_discrete("# of tree") + 
+  ggtitle("Precision in function of # of tree and node")
 
 ada_sensitivity<- ggplot(adaboost_metrics, aes(x=tree.nodes, y = sensitivity)) + 
   geom_point(aes(colour = as.factor(tree.num)),size = 3) + 
-  scale_color_discrete("# of nodes") + 
-  ggtitle("Sensitivity and number of nodes")
+  scale_color_discrete("# of tree") + 
+  ggtitle("Sensitivity in function of # of tree and nodes")
 
 ada_score <- ggplot(adaboost_metrics, aes(x=tree.nodes, y = score)) + 
   geom_point(aes(colour = as.factor(tree.num)),size = 3) + 
-  scale_color_discrete("# of nodes") + 
-  ggtitle("Score and number of nodes")
+  scale_color_discrete("# of tree") + 
+  ggtitle("Score in function of # of tree and node")
 
 grid.arrange(ada_accuracy, ada_precision,ada_sensitivity,ada_score, nrow = 2)
 
@@ -395,26 +395,43 @@ save_kable(comparkbl,"compar.tex")
 
 
 
-###################################### XG-Boost ######################################
+
+
+
+
+
+
+
+
+
+
+
+
+# XGboost ----------------------------------------------------------------
 
 library(xgboost)
 
+# remove the -1 which was only for the adaBoost
 ytrain = ifelse(ytrain == 1, 1, 0) 
 ytest = ifelse(ytest == 1, 1, 0) 
 
 
+#Creation of Dataframe --------------------------------------------------------------------
 dtrain <- xgb.DMatrix(data = xtrain,
                       label=ytrain)
 dvalidation <- xgb.DMatrix(data= xtest,
                            label = ytest)
-
 watchlist <- list(train=dtrain, validation=dvalidation)
 
 
+#Setting the parameters of the grid --------------------------------------------------------
 max_depth <- 2:8 
 shrinkage <- c(0.1, 0.01, 0.001, 0.0001) 
 xgb_models <- list()
+dlist = list()
+slist = list()
 
+#Loop on each parameters in order to train the XG-Boost Model ----------------------------------
 for(d in max_depth) {
   for(s in shrinkage){
     param <- list(
@@ -442,8 +459,13 @@ for(d in max_depth) {
       verbose = FALSE)
     
     xgb_models = append(xgb_models, list(mod))
+    dlist <- append(dlist,d)
+    slist <- append(slist,s)
   }
 }
+
+
+# Calcul of the Metrics  --------------------------------------------------------
 
 xgb_metrics <- data.frame(algo = character(),
                           tree_depth = integer(),
@@ -451,24 +473,25 @@ xgb_metrics <- data.frame(algo = character(),
                           shrinkage = numeric(),
                           accuracy = numeric(),
                           precision = numeric(),
-                          recall = numeric(),
-                          f1_score = numeric(),
+                          sensitivity = numeric(),
+                          score = numeric(),
                           training_accuracy = numeric(),
                           training_precision = numeric(),
-                          training_recall = numeric(),
-                          training_f1_score = numeric(),
+                          training_sensitivity = numeric(),
+                          training_score = numeric(),
                           stringsAsFactors = FALSE)
 
 
 ConfusionMatrix <- function(prediction, truth) {
   conf <- matrix(c(table(prediction, truth),0,0),nrow=2)
   df <- data.frame(precision = conf[2,2]/sum(conf[,2]),
-                   recall = conf[2,2]/sum(conf[2,]),
+                   sensitivity = conf[2,2]/sum(conf[2,]),
                    accuracy = (conf[1,1] + conf[2,2]) / length(prediction))
-  df$f1 <- 2/((1/df$precision) + (1/df$recall))
+  df$score <- ( 0.5*df$sensitivity + 
+                  0.3*df$precision +
+                  0.2*df$accuracy)
   return(list(confusion_matrix=conf, metrics=df))
 }
-
 
 for(i in 1:28) {
   mod = xgb_models[[i]]
@@ -480,19 +503,207 @@ for(i in 1:28) {
   
   xgb_metrics <- xgb_metrics %>% 
     add_row(algo = "Gradient Boosting",
-            tree_depth = d[i],
+            tree_depth = dlist[[i]],
             n_trees = mod$niter,
-            shrinkage = s[i],
+            shrinkage = slist[[i]],
             accuracy = validation_metrics$accuracy,
             precision = validation_metrics$precision,
-            recall = validation_metrics$recall,
-            f1_score = validation_metrics$f1,
+            sensitivity = validation_metrics$sensitivity,
+            score = validation_metrics$score,
             training_accuracy = training_metrics$accuracy,
             training_precision = training_metrics$precision,
-            training_recall = training_metrics$recall,
-            training_f1_score = training_metrics$f1)
-  
+            training_sensitivity = training_metrics$sensitivity,
+            training_score = training_metrics$score)
 }
+
+xgb_metrics$accuracy  <-round(xgb_metrics$accuracy, 3)
+xgb_metrics$precision <-round(xgb_metrics$precision, 3)
+xgb_metrics$sensitivity <-round(xgb_metrics$sensitivity, 3)
+xgb_metrics$score <-round(xgb_metrics$score, 3)
+
+
+
+
+# Exporting tables --------------------------------------------------------
+
+xgbgridtab1<-xgb_metrics[1:28,] %>% 
+  select(tree_depth, n_trees, shrinkage, accuracy, precision, sensitivity, score) %>% 
+  arrange(tree_depth, n_trees)
+
+xgbgridtab_1 <- kbl(xgbgridtab1, 'latex', caption = "XGB Gridsearch", booktabs=T, 
+                    linesep=c("","", "", "","", "", "", "\\hline")) %>% #LINESEP A CHANGER SI ON CHANGE LE GRID
+  kable_styling(latex_options = c("striped", "scale_down")) %>%
+  column_spec(3, color = spec_color(xgbgridtab1$accuracy, end = 0.8, direction = -1))%>%
+  column_spec(4, color = spec_color(xgbgridtab1$precision, end = 0.8, direction = -1))%>%
+  column_spec(5, color = spec_color(xgbgridtab1$sensitivity, end = 0.8, direction = -1))%>%
+  column_spec(6, color = spec_color(xgbgridtab1$score, end = 0.8, direction = -1))
+
+save_kable(xgbgridtab_1,'xgbgridtab_1.tex')
+
+
+# Making graphs -----------------------------------------------------------
+library(ggplot2)
+library(gridExtra)
+
+xgb_accuracy <- ggplot(xgb_metrics, aes(x=tree_depth, y = accuracy)) + 
+  geom_point(aes(colour = as.factor(shrinkage)),size = 3) + 
+  scale_color_discrete("# of shrinkage") + 
+  ggtitle("Accuracy in function of # of shrinkage and max depth")
+
+xgb_precision <- ggplot(xgb_metrics, aes(x=tree_depth, y = precision)) + 
+  geom_point(aes(colour = as.factor(shrinkage)),size = 3) + 
+  scale_color_discrete("# of shrinkage") + 
+  ggtitle("Precision in function of # of shrinkage and max depth")
+
+xgb_sensitivity <- ggplot(xgb_metrics, aes(x=tree_depth, y = sensitivity)) + 
+  geom_point(aes(colour = as.factor(shrinkage)),size = 3) + 
+  scale_color_discrete("# of shrinkage") + 
+  ggtitle("Sensitivity in function of # of shrinkage and max depth")
+
+xgb_score <- ggplot(xgb_metrics, aes(x=tree_depth, y = score)) + 
+  geom_point(aes(colour = as.factor(shrinkage)),size = 3) + 
+  scale_color_discrete("# of shrinkage") + 
+  ggtitle("Score in function of # of shrinkage and max depth")
+
+grid.arrange(xgb_accuracy, xgb_precision,xgb_sensitivity,xgb_score, nrow = 2)
+
+
+# Threshold selection -----------------------------------------------------
+alphas <- (0:100)*0.001
+
+XGBoost.threshold <-
+  for(a in alphas){
+    param <- list(
+      objective = "binary:logistic",
+      eta = 1e-02,
+      max_depth = 3,
+      colsamplebytree = 0.8,
+      subsample = 0.8, 
+      #min_child_weight = 3,
+      base_score = 0.50,
+      #lambda = 100,
+      #lambda_bias = 5,
+      alpha = a,
+      verbose = FALSE
+    )
+    mod = xgboost::xgb.train(
+      params = param,
+      data = dtrain, 
+      nrounds = 1000,
+      watchlist = watchlist, 
+      nthread = 10,
+      maximize = FALSE,
+      early_stopping_rounds = 100,
+      verbose = FALSE)
+    
+    
+    
+    xgboost2.yhato =  predict(mod, dvalidation, type="response")
+    xgboost2.yhat  <- rep(-1, length(xgboost2.yhato))
+    xgboost2.yhat[xgboost2.yhato > a] <- 1
+    
+    confusion.test   = matrix(c(table(ytest, xgboost2.yhat),0,0),nrow=2)
+    sensitivity.test = confusion.test[2,2]  / sum(confusion.test[2,])
+    fpr.test         = confusion.test[1,2] / sum(confusion.test[1,])
+    
+    results2 = data.frame(
+      algorithm = "XG-Boost",
+      Threshold = a,
+      sensitivity = sensitivity.test,
+      FalsePositiveRate = fpr.test,
+      stringsAsFactors = FALSE)
+    list(model = adabst2, metrics = results2)
+  }
+
+xgboost_metrics2 <- 
+  lapply(XGBoost.threshold, function(inside_item)
+  { inside_item[['metrics']]})
+
+xgboost_metrics2 <- as_tibble(bind_rows(lapply(xgboost_metrics2, bind_rows)))
+xgboost.AUROC<-sum(xgboost_metrics2$sensitivity*0.001)
+
+ROC_curve <- ggplot(xgboost_metrics2, aes(x = FalsePositiveRate, y=sensitivity )) + 
+  geom_line() +
+  ggtitle("ROC Curve",subtitle = "AUROC = 0.82")
+
+# logit VS AdaBoost Vs XgBoost -------------------------------------------------------
+
+
+## AdaBoost
+ytrain2<-as.numeric(ytrain)
+ytrain2[ytrain == 0] <- -1
+adabst4 = JOUSBoost::adaboost(X = xtrain, y = ytrain2, tree_depth = 5, n_rounds =75)
+adabst4.yhat = JOUSBoost::predict.adaboost(adabst4, xtest, type="response")
+
+confusion.best   = matrix(c(table(ytest, adabst4.yhat),0,0),nrow=2)
+accuracy.best    = (confusion.best[2,2] + confusion.best[1,1] ) / sum(confusion.best)
+precision.best   = confusion.best[2,2]  / sum(confusion.best[,2])
+sensitivity.best = confusion.best[2,2]  / sum(confusion.best[2,])
+score.best <- ( 0.5*sensitivity.best + 
+                  0.3*precision.best +
+                  0.2*accuracy.best)
+
+## Logit
+
+df.logit<-data.frame(cbind(xtrain,ytrain2))
+logit<- glm(ytrain2~., df.logit, family = "binomial" )
+yhatlogito<- predict(logit, newdata= data.frame(xtest), "response")
+yhatlogit <- rep(0, length(yhatlogito))
+yhatlogit[yhatlogito>0.5]<-1
+
+confusion.logit   = matrix(c(table(ytest, yhatlogit),0,0),nrow=2)
+accuracy.logit    = (confusion.logit[2,2] + confusion.logit[1,1] ) / sum(confusion.logit)
+precision.logit   = confusion.logit[2,2]  / sum(confusion.logit[,2])
+sensitivity.logit = confusion.logit[2,2]  / sum(confusion.logit[2,])
+score.logit <- (  0.5*sensitivity.logit + 
+                    0.3*precision.logit   +
+                    0.2*accuracy.logit)
+
+## XG-Boost
+
+param <- list(
+  objective = "binary:logistic",
+  eta = 1e-02,
+  max_depth = 3,
+  colsamplebytree = 0.8,
+  subsample = 0.8, 
+  #min_child_weight = 3,
+  base_score = 0.50,
+  #lambda = 100,
+  #lambda_bias = 5,
+  alpha = 0.5, ####################### A changer ##############################
+  verbose = FALSE
+)
+
+mod = xgboost::xgb.train(
+  params = param,
+  data = dtrain, 
+  nrounds = 1000,
+  watchlist = watchlist, 
+  nthread = 10,
+  maximize = FALSE,
+  early_stopping_rounds = 100,
+  verbose = FALSE)
+
+confusion.xgb   = matrix(c(table(ytest, adabst4.yhat),0,0),nrow=2)
+accuracy.xgb     = (confusion.xgb[2,2] + confusion.xgb[1,1] ) / sum(confusion.xgb)
+precision.xgb    = confusion.xgb[2,2]  / sum(confusion.xgb[,2])
+sensitivity.xgb  = confusion.xgb[2,2]  / sum(confusion.xgb[2,])
+score.xgb <- ( 0.5*sensitivity.xgb + 
+                  0.3*precision.xgb +
+                  0.2*accuracy.xgb)
+
+compar=data.frame( 
+  algorithm   = c("Logit","AdaBoost","XG-Boost"),
+  accuracy    = c(accuracy.logit, accuracy.best,accuracy.xgb),
+  precision   = c(precision.logit, precision.best,precision.xgb),
+  sensitivity = c(sensitivity.logit, sensitivity.best,sensitivity.xgb),
+  score       = c(score.logit, score.best,score.xgb) )
+
+comparkbl<-kbl(compar, 'latex', caption = "Logit vs Adaboost vs XG-Boost", booktabs=T)
+save_kable(comparkbl,"compar.tex")
+
+
 
 
 
