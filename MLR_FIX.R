@@ -569,7 +569,7 @@ grid.arrange(xgb_accuracy, xgb_precision,xgb_sensitivity,xgb_score, nrow = 2)
 
 
 # Threshold selection -----------------------------------------------------
-alphas <- (0:100)*0.001
+alphas <- (0:100)*0.01
 
 XGBoost.threshold <-
   for(a in alphas){
@@ -612,7 +612,7 @@ XGBoost.threshold <-
       sensitivity = sensitivity.test,
       FalsePositiveRate = fpr.test,
       stringsAsFactors = FALSE)
-    list(model = adabst2, metrics = results2)
+    list(model = mod, metrics = results2)
   }
 
 xgboost_metrics2 <- 
@@ -626,8 +626,8 @@ ROC_curve <- ggplot(xgboost_metrics2, aes(x = FalsePositiveRate, y=sensitivity )
   geom_line() +
   ggtitle("ROC Curve",subtitle = "AUROC = 0.82")
 
-# logit VS AdaBoost Vs XgBoost -------------------------------------------------------
 
+# logit VS AdaBoost Vs XgBoost -------------------------------------------------------
 
 ## AdaBoost
 ytrain2<-as.numeric(ytrain)
@@ -659,6 +659,10 @@ score.logit <- (  0.5*sensitivity.logit +
                     0.3*precision.logit   +
                     0.2*accuracy.logit)
 
+
+
+
+
 ## XG-Boost
 
 param <- list(
@@ -684,24 +688,22 @@ mod = xgboost::xgb.train(
   maximize = FALSE,
   early_stopping_rounds = 100,
   verbose = FALSE)
+preds = predict(mod, dvalidation, type="response")
+validation_metrics = ConfusionMatrix(preds > 0.5, ytest)$metrics
 
-confusion.xgb   = matrix(c(table(ytest, adabst4.yhat),0,0),nrow=2)
-accuracy.xgb     = (confusion.xgb[2,2] + confusion.xgb[1,1] ) / sum(confusion.xgb)
-precision.xgb    = confusion.xgb[2,2]  / sum(confusion.xgb[,2])
-sensitivity.xgb  = confusion.xgb[2,2]  / sum(confusion.xgb[2,])
-score.xgb <- ( 0.5*sensitivity.xgb + 
-                  0.3*precision.xgb +
-                  0.2*accuracy.xgb)
+
 
 compar=data.frame( 
   algorithm   = c("Logit","AdaBoost","XG-Boost"),
-  accuracy    = c(accuracy.logit, accuracy.best,accuracy.xgb),
-  precision   = c(precision.logit, precision.best,precision.xgb),
-  sensitivity = c(sensitivity.logit, sensitivity.best,sensitivity.xgb),
-  score       = c(score.logit, score.best,score.xgb) )
+  accuracy    = c(accuracy.logit, accuracy.best, validation_metrics$accuracy),
+  precision   = c(precision.logit, precision.best, validation_metrics$precision),
+  sensitivity = c(sensitivity.logit, sensitivity.best, validation_metrics$sensitivity),
+  score       = c(score.logit, score.best, validation_metrics$score) )
 
 comparkbl<-kbl(compar, 'latex', caption = "Logit vs Adaboost vs XG-Boost", booktabs=T)
 save_kable(comparkbl,"compar.tex")
+
+
 
 
 
