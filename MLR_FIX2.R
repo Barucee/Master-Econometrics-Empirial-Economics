@@ -299,6 +299,12 @@ watchlist <- list(train=dtrain, validation=dvalidation)
 max_depth <- 2:8 
 shrinkage <- c(0.1, 0.01, 0.001, 0.0001) 
 xgb_models <- list()
+dlist = list()
+slist = list()
+
+max_depth <- 2:8 
+shrinkage <- c(0.1, 0.01, 0.001, 0.0001) 
+xgb_models <- list()
 
 for(d in max_depth) {
   for(s in shrinkage){
@@ -327,6 +333,8 @@ for(d in max_depth) {
       verbose = FALSE)
     
     xgb_models = append(xgb_models, list(mod))
+    dlist <- append(dlist,d)
+    slist <- append(slist,s)
   }
 }
 
@@ -337,11 +345,11 @@ xgb_metrics <- data.frame(algo = character(),
                           accuracy = numeric(),
                           precision = numeric(),
                           recall = numeric(),
-                          f1_score = numeric(),
+                          score = numeric(),
                           training_accuracy = numeric(),
                           training_precision = numeric(),
                           training_recall = numeric(),
-                          training_f1_score = numeric(),
+                          training_score = numeric(),
                           stringsAsFactors = FALSE)
 
 
@@ -350,10 +358,11 @@ ConfusionMatrix <- function(prediction, truth) {
   df <- data.frame(precision = conf[2,2]/sum(conf[,2]),
                    recall = conf[2,2]/sum(conf[2,]),
                    accuracy = (conf[1,1] + conf[2,2]) / length(prediction))
-  df$f1 <- 2/((1/df$precision) + (1/df$recall))
+  df$score <- ( 0.5*df$recall + 
+                                0.3*df$precision +
+                                0.2*df$accuracy)
   return(list(confusion_matrix=conf, metrics=df))
 }
-
 
 for(i in 1:28) {
   mod = xgb_models[[i]]
@@ -365,22 +374,17 @@ for(i in 1:28) {
   
   xgb_metrics <- xgb_metrics %>% 
     add_row(algo = "Gradient Boosting",
-            tree_depth = d[i],
+            tree_depth = dlist[[i]],
             n_trees = mod$niter,
-            shrinkage = s[i],
+            shrinkage = slist[[i]],
             accuracy = validation_metrics$accuracy,
             precision = validation_metrics$precision,
             recall = validation_metrics$recall,
-            f1_score = validation_metrics$f1,
+            score = validation_metrics$score,
             training_accuracy = training_metrics$accuracy,
             training_precision = training_metrics$precision,
             training_recall = training_metrics$recall,
-            training_f1_score = training_metrics$f1)
-  
+            training_score = training_metrics$score)
 }
-
-
-
-
 
 

@@ -1,0 +1,43 @@
+\begin{table}
+
+\caption{XGB Gridsearch}
+\centering
+\resizebox{\linewidth}{!}{
+\begin{tabular}[t]{rr>{}r>{}r>{}r>{}rr}
+\toprule
+tree\_depth & n\_trees & shrinkage & accuracy & precision & sensitivity & score\\
+\midrule
+\cellcolor{gray!6}{2} & \cellcolor{gray!6}{266} & \textcolor[HTML]{21908D}{\cellcolor{gray!6}{1e-01}} & \textcolor[HTML]{440154}{\cellcolor{gray!6}{0.916}} & \textcolor[HTML]{7AD151}{\cellcolor{gray!6}{0.333}} & \textcolor[HTML]{20928C}{\cellcolor{gray!6}{0.700}} & \cellcolor{gray!6}{0.633}\\
+2 & 1000 & \textcolor[HTML]{21908D}{1e-02} & \textcolor[HTML]{440154}{0.911} & \textcolor[HTML]{7AD151}{0.286} & \textcolor[HTML]{20928C}{0.667} & 0.601\\
+\cellcolor{gray!6}{2} & \cellcolor{gray!6}{1000} & \textcolor[HTML]{31688E}{\cellcolor{gray!6}{1e-03}} & \textcolor[HTML]{2D718E}{\cellcolor{gray!6}{0.897}} & \textcolor[HTML]{2CB17E}{\cellcolor{gray!6}{NaN}} & \textcolor[HTML]{26AD81}{\cellcolor{gray!6}{0.000}} & \cellcolor{gray!6}{NaN}\\
+2 & 1000 & \textcolor[HTML]{443983}{1e-04} & \textcolor[HTML]{355E8D}{0.897} & \textcolor[HTML]{1F9F88}{NaN} & \textcolor[HTML]{24868E}{0.000} & NaN\\
+\cellcolor{gray!6}{3} & \cellcolor{gray!6}{174} & \textcolor[HTML]{443983}{\cellcolor{gray!6}{1e-01}} & \textcolor[HTML]{287D8E}{\cellcolor{gray!6}{0.921}} & \textcolor[HTML]{228B8D}{\cellcolor{gray!6}{0.333}} & \textcolor[HTML]{23888E}{\cellcolor{gray!6}{0.778}} & \cellcolor{gray!6}{0.673}\\
+3 & 1000 & \textcolor[HTML]{440154}{1e-02} & \textcolor[HTML]{218E8D}{0.916} & \textcolor[HTML]{3C508B}{0.333} & \textcolor[HTML]{3E4B8A}{0.700} & 0.633\\
+\cellcolor{gray!6}{3} & \cellcolor{gray!6}{1000} & \textcolor[HTML]{443983}{\cellcolor{gray!6}{1e-03}} & \textcolor[HTML]{1FA088}{\cellcolor{gray!6}{0.897}} & \textcolor[HTML]{3C508B}{\cellcolor{gray!6}{NaN}} & \textcolor[HTML]{355E8D}{\cellcolor{gray!6}{0.000}} & \cellcolor{gray!6}{NaN}\\
+3 & 1000 & \textcolor[HTML]{443983}{1e-04} & \textcolor[HTML]{21A585}{0.897} & \textcolor[HTML]{453882}{NaN} & \textcolor[HTML]{3F4788}{0.000} & NaN\\
+\hline
+\cellcolor{gray!6}{4} & \cellcolor{gray!6}{160} & \textcolor[HTML]{7AD151}{\cellcolor{gray!6}{1e-01}} & \textcolor[HTML]{7AD151}{\cellcolor{gray!6}{0.911}} & \textcolor[HTML]{228B8D}{\cellcolor{gray!6}{0.286}} & \textcolor[HTML]{7AD151}{\cellcolor{gray!6}{0.667}} & \cellcolor{gray!6}{0.601}\\
+4 & 828 & \textcolor[HTML]{29B07F}{1e-02} & \textcolor[HTML]{54C568}{0.921} & \textcolor[HTML]{3C508B}{0.333} & \textcolor[HTML]{25838E}{0.778} & 0.673\\
+\cellcolor{gray!6}{4} & \cellcolor{gray!6}{1000} & \textcolor[HTML]{21908D}{\cellcolor{gray!6}{1e-03}} & \textcolor[HTML]{3DBC74}{\cellcolor{gray!6}{0.897}} & \textcolor[HTML]{3C508B}{\cellcolor{gray!6}{0.048}} & \textcolor[HTML]{2A788E}{\cellcolor{gray!6}{0.500}} & \cellcolor{gray!6}{0.444}\\
+4 & 1000 & \textcolor[HTML]{440154}{1e-04} & \textcolor[HTML]{1F968B}{0.897} & \textcolor[HTML]{453882}{NaN} & \textcolor[HTML]{453781}{0.000} & NaN\\
+\cellcolor{gray!6}{5} & \cellcolor{gray!6}{145} & \textcolor[HTML]{29B07F}{\cellcolor{gray!6}{1e-01}} & \textcolor[HTML]{54C568}{\cellcolor{gray!6}{0.906}} & \textcolor[HTML]{3C508B}{\cellcolor{gray!6}{0.238}} & \textcolor[HTML]{25838E}{\cellcolor{gray!6}{0.625}} & \cellcolor{gray!6}{0.565}\\
+5 & 697 & \textcolor[HTML]{29B07F}{1e-02} & \textcolor[HTML]{54C568}{0.921} & \textcolor[HTML]{481F70}{0.333} & \textcolor[HTML]{3A538B}{0.778} & 0.673\\
+\cellcolor{gray!6}{5} & \cellcolor{gray!6}{1000} & \textcolor[HTML]{7AD151}{\cellcolor{gray!6}{1e-03}} & \textcolor[HTML]{69CD5B}{\cellcolor{gray!6}{0.897}} & \textcolor[HTML]{453882}{\cellcolor{gray!6}{0.048}} & \textcolor[HTML]{2B748E}{\cellcolor{gray!6}{0.500}} & \cellcolor{gray!6}{0.444}\\
+5 & 1000 & \textcolor[HTML]{29B07F}{1e-04} & \textcolor[HTML]{54C568}{0.897} & \textcolor[HTML]{453882}{0.048} & \textcolor[HTML]{2F6C8E}{0.500} & 0.444\\
+\hline
+\cellcolor{gray!6}{6} & \cellcolor{gray!6}{156} & \textcolor[HTML]{21908D}{\cellcolor{gray!6}{1e-01}} & \textcolor[HTML]{3DBC74}{\cellcolor{gray!6}{0.911}} & \textcolor[HTML]{3C508B}{\cellcolor{gray!6}{0.286}} & \textcolor[HTML]{2A788E}{\cellcolor{gray!6}{0.667}} & \cellcolor{gray!6}{0.601}\\
+6 & 650 & \textcolor[HTML]{21908D}{1e-02} & \textcolor[HTML]{3FBC73}{0.921} & \textcolor[HTML]{453882}{0.333} & \textcolor[HTML]{33628D}{0.778} & 0.673\\
+\cellcolor{gray!6}{6} & \cellcolor{gray!6}{1000} & \textcolor[HTML]{440154}{\cellcolor{gray!6}{1e-03}} & \textcolor[HTML]{1FA187}{\cellcolor{gray!6}{0.901}} & \textcolor[HTML]{440154}{\cellcolor{gray!6}{0.095}} & \textcolor[HTML]{440154}{\cellcolor{gray!6}{0.667}} & \cellcolor{gray!6}{0.542}\\
+6 & 1000 & \textcolor[HTML]{443983}{1e-04} & \textcolor[HTML]{23A983}{0.897} & \textcolor[HTML]{481F70}{0.048} & \textcolor[HTML]{472F7D}{0.500} & 0.444\\
+\cellcolor{gray!6}{7} & \cellcolor{gray!6}{166} & \textcolor[HTML]{443983}{\cellcolor{gray!6}{1e-01}} & \textcolor[HTML]{23A983}{\cellcolor{gray!6}{0.901}} & \textcolor[HTML]{481F70}{\cellcolor{gray!6}{0.286}} & \textcolor[HTML]{472F7D}{\cellcolor{gray!6}{0.545}} & \cellcolor{gray!6}{0.539}\\
+7 & 689 & \textcolor[HTML]{440154}{1e-02} & \textcolor[HTML]{1E9C89}{0.921} & \textcolor[HTML]{481F70}{0.333} & \textcolor[HTML]{481F70}{0.778} & 0.673\\
+\cellcolor{gray!6}{7} & \cellcolor{gray!6}{1000} & \textcolor[HTML]{440154}{\cellcolor{gray!6}{1e-03}} & \textcolor[HTML]{1F968B}{\cellcolor{gray!6}{0.901}} & \textcolor[HTML]{453882}{\cellcolor{gray!6}{0.095}} & \textcolor[HTML]{453781}{\cellcolor{gray!6}{0.667}} & \cellcolor{gray!6}{0.542}\\
+7 & 1000 & \textcolor[HTML]{440154}{1e-04} & \textcolor[HTML]{1F968B}{0.897} & \textcolor[HTML]{453882}{0.048} & \textcolor[HTML]{453781}{0.500} & 0.444\\
+\hline
+\cellcolor{gray!6}{8} & \cellcolor{gray!6}{165} & \textcolor[HTML]{21908D}{\cellcolor{gray!6}{1e-01}} & \textcolor[HTML]{440154}{\cellcolor{gray!6}{0.916}} & \textcolor[HTML]{7AD151}{\cellcolor{gray!6}{0.333}} & \textcolor[HTML]{20928C}{\cellcolor{gray!6}{0.700}} & \cellcolor{gray!6}{0.633}\\
+8 & 675 & \textcolor[HTML]{21908D}{1e-02} & \textcolor[HTML]{440154}{0.921} & \textcolor[HTML]{7AD151}{0.333} & \textcolor[HTML]{20928C}{0.778} & 0.673\\
+\cellcolor{gray!6}{8} & \cellcolor{gray!6}{1000} & \textcolor[HTML]{31688E}{\cellcolor{gray!6}{1e-03}} & \textcolor[HTML]{2D718E}{\cellcolor{gray!6}{0.906}} & \textcolor[HTML]{2CB17E}{\cellcolor{gray!6}{0.143}} & \textcolor[HTML]{26AD81}{\cellcolor{gray!6}{0.750}} & \cellcolor{gray!6}{0.599}\\
+8 & 1000 & \textcolor[HTML]{443983}{1e-04} & \textcolor[HTML]{355E8D}{0.897} & \textcolor[HTML]{1F9F88}{0.048} & \textcolor[HTML]{24868E}{0.500} & 0.444\\
+\bottomrule
+\end{tabular}}
+\end{table}
