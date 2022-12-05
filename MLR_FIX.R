@@ -18,7 +18,7 @@ WorldBankDataRaw   <- read_excel("./WB data.xlsx", na = "..")
 IMFPublicDebtToGDP <- read_excel("./IMF - Public Debt-to-GDP.xls", 
                                  na = "no data")
 crises             <- read_excel("./Crises.xlsx")
-crisesm            <- crises[, -4]
+crises             <- crises[, -4]
 
 
 
@@ -598,8 +598,16 @@ save_kable(comparkbl,"compar.tex")
 
 
 # XGBOOST Threshold selection -----------------------------------------------------
-alphas <- (0:100)*0.01
+results2 = data.frame(
+  algorithm = "XG-Boost",
+  Threshold = "",
+  sensitivity = "" ,
+  FalsePositiveRate = "" ,
+  stringsAsFactors =FALSE  )
 
+
+alphas <- (0:100)*0.01
+i=0
 XGBoost.threshold <-
   for(a in alphas){
     param <- list(
@@ -626,6 +634,9 @@ XGBoost.threshold <-
       verbose = FALSE)
     
     
+    i=i+1
+    
+    
     
     xgboost2.yhato =  predict(mod, dvalidation, type="response")
     xgboost2.yhat  <- rep(-1, length(xgboost2.yhato))
@@ -635,13 +646,14 @@ XGBoost.threshold <-
     sensitivity.test = confusion.test[2,2]  / sum(confusion.test[2,])
     fpr.test         = confusion.test[1,2] / sum(confusion.test[1,])
     
-    results2 = data.frame(
-      algorithm = "XG-Boost",
-      Threshold = a,
-      sensitivity = sensitivity.test,
-      FalsePositiveRate = fpr.test,
-      stringsAsFactors = FALSE)
-    list(model = mod, metrics = results2)
+    results2[i,] = c(
+      "XG-Boost",
+      a,
+      sensitivity.test,
+      fpr.test)
+    
+    
+  
   }
 
 xgboost_metrics2 <- 
