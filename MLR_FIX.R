@@ -15,7 +15,8 @@ library(knitr)
 
 
 WorldBankDataRaw   <- read_excel("./WB data.xlsx", na = "..")
-IMFPublicDebtToGDP <- read_excel("./IMF - Public Debt-to-GDP.xls", na = "no data")
+IMFPublicDebtToGDP <- read_excel("./IMF - Public Debt-to-GDP.xls", 
+                                 na = "no data")
 crises             <- read_excel("./Crises.xlsx")
 crisesm            <- crises[, -4]
 
@@ -75,8 +76,10 @@ AdvancedCountry <- c("Australia"
 
 # Filtering the advanced countries
 crisesAdvanced             <- filter(crises, Country %in% AdvancedCountry)
-WorldBankDataAdvanced      <- filter(WorldBankDataRaw, Country %in% AdvancedCountry)
-IMFPublicDebtToGDPAdvanced <- filter(IMFPublicDebtToGDP, Country %in% AdvancedCountry) #Pas Hong Kong
+WorldBankDataAdvanced      <- filter(WorldBankDataRaw, 
+                                     Country %in% AdvancedCountry)
+IMFPublicDebtToGDPAdvanced <- filter(IMFPublicDebtToGDP, 
+                                     Country %in% AdvancedCountry) 
 
 rm(crises)
 rm(IMFPublicDebtToGDP)
@@ -104,7 +107,8 @@ df <- merge(IMFPublicDebtToGDPAdvanced,WorldBankDataAdvanced)
 df$openness_index <- df$Exports + df$Imports
 
 #selecting variables of interest
-df <- select(df, -c(`External debt`,`Exports`,`Imports`,`Public debt`,`Bank capital to assets ratio (%)`) )
+df <- select(df, -c(`External debt`,`Exports`,`Imports`,`Public debt`,
+                    `Bank capital to assets ratio (%)`) )
 
 #converting 'crises' data from quarterly to yearly
 crisesAdvanced <- crisesAdvanced %>%
@@ -159,17 +163,16 @@ df_noNA <- df_noNA %>%
 df_noNA$crysis[df_noNA$crysis == 0] <- -1
 
 df_fitting <- df_noNA %>%
-  select(-banking_crysis,-Pre1,-Pre2)
+  select(-banking_crysis, -Pre1, -Pre2)
 
 
 # Adaboost ----------------------------------------------------------------
 
-library(JOUSBoost) 
+library(JOUSBoost)
 library(foreach)
 library(doSNOW)
 library(kableExtra)
 set.seed(777)
-
 
 
 
@@ -200,14 +203,15 @@ trees.num = c(
 #this is for parallel processing, put processor cores in clusters
 
 numOfclusters <- 3
-cl <- makeCluster(numOfclusters)
+cl            <- makeCluster(numOfclusters)
 registerDoSNOW(cl)
 
 
 adaboost.grid <-
   foreach(t = tree.nodes) %:%
   foreach(n = trees.num)  %dopar% {
-    adabst = JOUSBoost::adaboost(X = xtrain, y = ytrain, tree_depth = t, n_rounds =n)
+    adabst = JOUSBoost::adaboost(X = xtrain, y = ytrain,
+                                 tree_depth = t, n_rounds =n)
     
     confusion.train   = matrix(c(adabst$confusion_matrix,0,0),nrow=2)
     accuracy.train    = (confusion.train[2,2] + confusion.train[1,1] ) / sum(confusion.train)
@@ -262,7 +266,7 @@ adagridtab2<-adaboost_metrics[25:48,] %>%
 
 
 adagridtab_1 <- kbl(adagridtab1, 'latex', caption = "Adaboost Gridsearch, 1 to 3 nodes", booktabs=T, 
-             linesep=c("","", "", "","", "", "", "\\hline")) %>% #LINESEP A CHANGER SI ON CHANGE LE GRID
+             linesep=c("","", "", "","", "", "", "\\hline")) %>% 
   kable_styling(latex_options = c("striped", "scale_down")) %>%
   column_spec(3, color = spec_color(adagridtab1$accuracy, end = 0.8, direction = -1))%>%
   column_spec(4, color = spec_color(adagridtab1$precision, end = 0.8, direction = -1))%>%
@@ -271,7 +275,7 @@ adagridtab_1 <- kbl(adagridtab1, 'latex', caption = "Adaboost Gridsearch, 1 to 3
 
 
 adagridtab_2 <- kbl(adagridtab2, 'latex', caption = "Adaboost Gridsearch, 4 to 6 nodes", booktabs=T, 
-                    linesep=c("","", "", "","", "", "", "\\hline")) %>% #LINESEP A CHANGER SI ON CHANGE LE GRID
+                    linesep=c("","", "", "","", "", "", "\\hline")) %>%
   kable_styling(latex_options = c("striped", "scale_down")) %>%
   column_spec(3, color = spec_color(adagridtab2$accuracy, end = 0.8, direction = -1))%>%
   column_spec(4, color = spec_color(adagridtab2$precision, end = 0.8, direction = -1))%>%
@@ -317,7 +321,8 @@ alphas <- (0:1000)*0.0001
 
 adaboost.threshold <-
   foreach(a = alphas)  %dopar% {
-    adabst2 = JOUSBoost::adaboost(X = xtrain, y = ytrain, tree_depth = 1, n_rounds =90)
+    adabst2 = JOUSBoost::adaboost(X = xtrain, y = ytrain,
+                                  tree_depth = 1, n_rounds =90)
     adabst2.yhato = JOUSBoost::predict.adaboost(adabst2, xtest, type="prob")
     adabst2.yhat  <- rep(-1, length(adabst2.yhato))
     adabst2.yhat[adabst2.yhato > a] <- 1
@@ -353,22 +358,22 @@ ROC_curve <- ggplot(adaboost_metrics2, aes(x = FalsePositiveRate, y=sensitivity 
 
 library(xgboost)
 
-# remove the -1 which was only for the adaBoost
+# removing -1 which was only for the JOUSBOOST package
 ytrain = ifelse(ytrain == 1, 1, 0) 
-ytest = ifelse(ytest == 1, 1, 0) 
+ytest  = ifelse(ytest == 1, 1, 0) 
 
 
-#Creation of Dataframe --------------------------------------------------------------------
-dtrain <- xgb.DMatrix(data = xtrain,
+#Creation of Dataframe ---------------------------------------------------------
+dtrain      <- xgb.DMatrix(data = xtrain,
                       label=ytrain)
 dvalidation <- xgb.DMatrix(data= xtest,
                            label = ytest)
-watchlist <- list(train=dtrain, validation=dvalidation)
+watchlist   <- list(train=dtrain, validation=dvalidation)
 
 
-#Setting the parameters of the grid --------------------------------------------------------
-max_depth <- 2:8 
-shrinkage <- c(0.1, 0.01, 0.001, 0.0001) 
+#Setting the parameters of the grid --------------------------------------------
+max_depth  <- 2:8 
+shrinkage  <- c(0.1, 0.01, 0.001, 0.0001) 
 xgb_models <- list()
 dlist = list()
 slist = list()
