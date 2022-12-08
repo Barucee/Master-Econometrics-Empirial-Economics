@@ -1,0 +1,121 @@
+_CASE_KEY;EVENTTIME;ACTIVITY_EN;Senior;Helper
+1;15/06/2022 09:00;WakeUp;Solange;Self
+1;15/06/2022 09:03;Going to toilet;Solange;Self
+1;15/06/2022 09:10;Taking a shower;Solange;Self
+1;15/06/2022 09:25;Dressing;Solange;Self
+1;15/06/2022 09:34;Taking a breakfast;Solange;Self
+1;15/06/2022 10:00;Walking in the garden;Solange;Self
+1;15/06/2022 10:30;Collective Game;Solange;Elsa
+1;15/06/2022 12:05;Having Lunch;Solange;Self
+1;15/06/2022 13:00;Watching TV;Solange;Self
+1;15/06/2022 15:00;Walking in the garden;Solange;Self
+1;15/06/2022 15:30;Phoning;Solange;Self
+1;15/06/2022 16:30;Collective Dancing;Solange;Adrian
+1;15/06/2022 19:00;Having Dinner;Solange;Self
+1;15/06/2022 20:30;Reading;Solange;Self
+1;15/06/2022 22:30;Sleeping;Solange;Self
+2;16/06/2022 09:15;WakeUp;Solange;Self
+2;16/06/2022 09:18;Going to toilet;Solange;Self
+2;16/06/2022 09:25;Taking a shower;Solange;Self
+2;16/06/2022 09:40;Taking a breakfast;Solange;Self
+2;16/06/2022 10:04;Dressing;Solange;Self
+2;16/06/2022 10:15;Walking in the garden;Solange;Self
+2;16/06/2022 10:45;Collective Game;Solange;Elsa
+2;16/06/2022 12:20;Having Lunch;Solange;Self
+2;16/06/2022 13:15;Watching TV;Solange;Self
+2;16/06/2022 15:15;Walking in the garden;Solange;Self
+2;16/06/2022 15:45;Phoning;Solange;Self
+2;16/06/2022 16:45;Collective Dancing;Solange;Adrian
+2;16/06/2022 19:15;Having Dinner;Solange;Self
+2;16/06/2022 20:45;Reading;Solange;Self
+2;16/06/2022 22:50;Sleeping;Solange;Self
+3;17/06/2022 08:55;WakeUp;Solange;Self
+3;17/06/2022 09:02;Going to toilet;Solange;Self
+3;17/06/2022 09:09;Taking a shower;Solange;Self
+3;17/06/2022 09:20;Taking a breakfast;Solange;Self
+3;17/06/2022 10:04;Dressing;Solange;Self
+3;17/06/2022 10:15;Walking in the garden;Solange;Self
+3;17/06/2022 10:45;Collective Game;Solange;Mario
+3;17/06/2022 12:20;Having Lunch;Solange;Self
+3;17/06/2022 13:15;Watching TV;Solange;Self
+3;17/06/2022 15:15;Walking in the garden;Solange;Self
+3;17/06/2022 15:45;Phoning;Solange;Self
+3;17/06/2022 16:45;Collective Dancing;Solange;James
+3;17/06/2022 19:15;Reading;Solange;Self
+3;17/06/2022 20:45;Having Dinner;Solange;Self
+3;17/06/2022 22:14;Sleeping;Solange;Self
+4;18/06/2022 08:46;WakeUp;Solange;Self
+4;18/06/2022 08:55;Going to toilet;Solange;Self
+4;18/06/2022 08:53;Taking a shower;Solange;Self
+4;18/06/2022 09:00;Taking a breakfast;Solange;Self
+4;18/06/2022 10:04;Dressing;Solange;Self
+4;18/06/2022 10:15;Walking in the garden;Solange;Marie Claude
+4;18/06/2022 10:45;Collective Game;Solange;Elsa
+4;18/06/2022 12:20;Having Lunch;Solange;Self
+4;18/06/2022 13:15;Watching TV;Solange;Self
+4;18/06/2022 15:15;Walking in the garden;Solange;Self
+4;18/06/2022 15:45;Phoning;Solange;Self
+4;18/06/2022 16:45;Collective Dancing;Solange;James
+4;18/06/2022 19:15;Having Dinner;Solange;Self
+4;18/06/2022 20:45;Reading;Solange;Self
+4;18/06/2022 21:38;Sleeping;Solange;Self
+5;15/06/2022 08:44;WakeUp;Mario;Self
+5;15/06/2022 09:03;Going to toilet;Mario;Self
+5;15/06/2022 09:10;Taking a shower;Mario;Self
+5;15/06/2022 09:25;Dressing;Mario;Self
+5;15/06/2022 09:34;Taking a breakfast;Mario;Self
+5;15/06/2022 10:00;Health care;Mario;Françoise
+5;15/06/2022 10:30;Collective Game;Mario;Elsa
+5;15/06/2022 12:05;Having Lunch;Mario;Self
+5;15/06/2022 13:00;Watching TV;Mario;Self
+5;15/06/2022 15:00;Walking in the garden;Mario;Self
+5;15/06/2022 15:30;Phoning;Mario;Self
+5;15/06/2022 16:30;Physiotherapie;Mario;Françoise
+5;15/06/2022 19:00;Collective cooking;Mario;Victor
+5;15/06/2022 20:30;Having Dinner;Mario;Self
+5;15/06/2022 21:45;Sleeping;Mario;Self
+6;16/06/2022 08:59;WakeUp;Mario;Self
+6;16/06/2022 09:18;Going to toilet;Mario;Self
+6;16/06/2022 09:25;Taking a shower;Mario;Self
+6;16/06/2022 09:40;Taking a breakfast;Mario;Self
+6;16/06/2022 10:04;Dressing;Mario;Self
+6;16/06/2022 10:15;Collective Game;Mario;ELsa
+6;16/06/2022 10:45;Health care;Mario;Françoise
+6;16/06/2022 12:20;Having Lunch;Mario;Self
+6;16/06/2022 13:15;Watching TV;Mario;Self
+6;16/06/2022 15:15;Walking in the garden;Mario;Self
+6;16/06/2022 15:45;Phoning;Mario;Self
+6;16/06/2022 16:45;Collective Cooking;Mario;Victor
+6;16/06/2022 19:15;Physiotherapie;Mario;Françoise
+6;16/06/2022 20:45;Having Dinner;Mario;Self
+6;16/06/2022 22:05;Sleeping;Mario;Self
+7;17/06/2022 08:39;WakeUp;Mario;Self
+7;17/06/2022 09:02;Going to toilet;Mario;Self
+7;17/06/2022 09:09;Taking a shower;Mario;Self
+7;17/06/2022 09:20;Taking a breakfast;Mario;Self
+7;17/06/2022 10:04;Dressing;Mario;Self
+7;17/06/2022 10:15;Collective Game;Mario;Self
+7;17/06/2022 10:45;Walking in the garden;Mario;James
+7;17/06/2022 12:20;Having Lunch;Mario;Self
+7;17/06/2022 13:15;Watching TV;Mario;Self
+7;17/06/2022 15:15;Walking in the garden;Mario;Self
+7;17/06/2022 15:45;Phoning;Mario;Self
+7;17/06/2022 16:45;Collective Dancing;Mario;James
+7;17/06/2022 19:15;Reading;Mario;Self
+7;17/06/2022 20:45;Having Dinner;Mario;Self
+7;17/06/2022 21:29;Sleeping;Mario;Self
+8;18/06/2022 08:55;WakeUp;Mario;Self
+8;18/06/2022 09:02;Going to toilet;Mario;Self
+8;18/06/2022 09:09;Taking a shower;Mario;Self
+8;18/06/2022 09:16;Taking a breakfast;Mario;Self
+8;18/06/2022 10:20;Dressing;Mario;Self
+8;18/06/2022 10:31;Walking in the garden;Mario;Elsa
+8;18/06/2022 11:01;Collective Game;Mario;Elsa
+8;18/06/2022 12:36;Having Lunch;Mario;Self
+8;18/06/2022 13:31;Watching TV;Mario;Self
+8;18/06/2022 15:31;Walking in the garden;Mario;Self
+8;18/06/2022 16:01;Phoning;Mario;Self
+8;18/06/2022 17:01;Collective Dancing;Mario;James
+8;18/06/2022 19:31;Having Dinner;Mario;Self
+8;18/06/2022 21:01;Reading;Mario;Self
+8;18/06/2022 21:01;Sleeping;Mario;Self
