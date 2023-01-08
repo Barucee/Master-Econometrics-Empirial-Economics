@@ -1,0 +1,11 @@
+---
+title: "Empirical Project"
+output: html_notebook
+---
+
+We will first load the data set 
+```{r Load the data}
+
+```
+
+
